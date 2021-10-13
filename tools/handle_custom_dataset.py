@@ -15,8 +15,10 @@ def transform_obj_to_ply(model_path):
     new_path = model_path
     model_path = model_path[:-3] + "obj"
     mesh = trimesh.load(model_path)
-    # cloud = trimesh.PointCloud(mesh.sample(10000))
-    mesh.export(new_path, file_type="ascii")
+    result = trimesh.exchange.ply.export_ply(mesh, encoding='ascii')
+    output_file = open(new_path, "wb+")
+    output_file.write(result)
+    output_file.close()
 
 def read_ply_points(ply_path):
     ply = PlyData.read(ply_path)
