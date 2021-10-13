@@ -14,8 +14,9 @@ def transform_obj_to_ply(model_path):
     # added function to create a ply mesh from an obj mesh
     new_path = model_path
     model_path = model_path[:-3] + "obj"
-    mesh = trimesh.load(model_path, force="mesh")
-    mesh.export(new_path)
+    mesh = trimesh.load(model_path)
+    cloud = trimesh.PointCloud(mesh)
+    cloud.export(new_path)
 
 def read_ply_points(ply_path):
     ply = PlyData.read(ply_path)
