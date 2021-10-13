@@ -218,6 +218,7 @@ def run_render():
 def run_custom():
     from tools import handle_custom_dataset
     data_root = 'data/custom'
+    handle_custom_dataset.resize_all_images(data_root)  # added for resizing all images
     handle_custom_dataset.sample_fps_points(data_root)
     handle_custom_dataset.custom_to_coco(data_root)
 

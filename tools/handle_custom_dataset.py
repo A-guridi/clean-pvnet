@@ -8,6 +8,7 @@ from PIL import Image
 from lib.utils import base_utils
 import json
 import trimesh
+import cv2
 
 
 def transform_obj_to_ply(model_path):
@@ -19,6 +20,28 @@ def transform_obj_to_ply(model_path):
     output_file = open(new_path, "wb+")
     output_file.write(result)
     output_file.close()
+
+
+def resize_all_images(data_root):
+    rgb_images = os.path.join(data_root, "rgb/")
+    masks = os.path.join(data_root, "mask/")
+    all_images = sorted(os.listdir(rgb_images))
+    all_masks = sorted(os.listdir(masks))
+    for image, mask in zip(all_images, all_masks):
+        im_path = os.path.join(rgb_images, image)
+        img = cv2.imread(im_path)
+        width = int(img.shape[1] - img.shape[1] % 32)
+        height = int(img.shape[0] - img.shape[0] % 32)
+        img = cv2.resize(img, (width, height), interpolation=cv2.INTER_AREA)
+        cv2.imwrite(im_path, img)
+
+        mask_path = os.path.join(masks, mask)
+        mask = cv2.imread(mask_path)
+        width = int(mask.shape[1] - mask.shape[1] % 32)
+        height = int(mask.shape[0] - mask.shape[0] % 32)
+        mask = cv2.resize(mask, (width, height), interpolation=cv2.INTER_AREA)
+        cv2.imwrite(mask_path, mask)
+
 
 def read_ply_points(ply_path):
     ply = PlyData.read(ply_path)
