@@ -26,6 +26,9 @@ def read_ply_points(ply_path):
 
 def sample_fps_points(data_root):
     ply_path = os.path.join(data_root, 'model.ply')
+    if not os.path.isfile(ply_path):
+        transform_obj_to_ply(ply_path)
+
     ply_points = read_ply_points(ply_path)
     fps_points = fps_utils.farthest_point_sampling(ply_points, 8, True)
     np.savetxt(os.path.join(data_root, 'fps.txt'), fps_points)
@@ -93,8 +96,6 @@ def record_ann(model_meta, img_id, ann_id, images, annotations):
 
 def custom_to_coco(data_root):
     model_path = os.path.join(data_root, 'model.ply')
-    if not os.path.isfile(model_path):
-        transform_obj_to_ply(model_path)
 
     renderer = OpenGLRenderer(model_path)
     K = np.loadtxt(os.path.join(data_root, 'camera.txt'))
