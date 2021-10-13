@@ -7,7 +7,15 @@ import tqdm
 from PIL import Image
 from lib.utils import base_utils
 import json
+import trimesh
 
+
+def transform_obj_to_ply(model_path):
+    # added function to create a ply mesh from an obj mesh
+    new_path = model_path
+    model_path = model_path[:-3] + "obj"
+    mesh = trimesh.load(model_path)
+    mesh.export(new_path)
 
 def read_ply_points(ply_path):
     ply = PlyData.read(ply_path)
@@ -85,6 +93,8 @@ def record_ann(model_meta, img_id, ann_id, images, annotations):
 
 def custom_to_coco(data_root):
     model_path = os.path.join(data_root, 'model.ply')
+    if not os.path.isfile(model_path):
+        transform_obj_to_ply(model_path)
 
     renderer = OpenGLRenderer(model_path)
     K = np.loadtxt(os.path.join(data_root, 'camera.txt'))
