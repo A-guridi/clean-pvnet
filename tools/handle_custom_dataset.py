@@ -15,7 +15,7 @@ def transform_obj_to_ply(model_path):
     new_path = model_path
     model_path = model_path[:-3] + "obj"
     mesh = trimesh.load(model_path)
-    cloud = trimesh.PointCloud(mesh.sample(100000))
+    cloud = trimesh.PointCloud(mesh.sample(5000))
     cloud.export(new_path)
 
 def read_ply_points(ply_path):
