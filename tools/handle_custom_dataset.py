@@ -25,22 +25,46 @@ def transform_obj_to_ply(model_path):
 def resize_all_images(data_root):
     rgb_images = os.path.join(data_root, "rgb/")
     masks = os.path.join(data_root, "mask/")
+    camera_intrinsics = os.path.join(data_root, "camera.txt")
     all_images = sorted(os.listdir(rgb_images))
     all_masks = sorted(os.listdir(masks))
+    assert len(all_images) == len(all_masks), "Error, the len of all the images should be the same as the masks"
     for image, mask in zip(all_images, all_masks):
+        # first we resize all the RGB images
         im_path = os.path.join(rgb_images, image)
         img = cv2.imread(im_path)
         width = int(img.shape[1] - img.shape[1] % 32)
         height = int(img.shape[0] - img.shape[0] % 32)
+
+        width_ratio = width / img.shape[1]
+        height_ratio = height / img.shape[0]
+
         img = cv2.resize(img, (width, height), interpolation=cv2.INTER_AREA)
         cv2.imwrite(im_path, img)
 
+        # secondly we resize all the masks to the same shape as the images
         mask_path = os.path.join(masks, mask)
         mask = cv2.imread(mask_path)
-        width = int(mask.shape[1] - mask.shape[1] % 32)
-        height = int(mask.shape[0] - mask.shape[0] % 32)
         mask = cv2.resize(mask, (width, height), interpolation=cv2.INTER_AREA)
         cv2.imwrite(mask_path, mask)
+
+        # lastly we reshape the cameras intrinsics
+        with open(camera_intrinsics, "r") as camera:
+            intrinsics = camera.readlines()
+        K = np.zeros(shape=(3, 3))
+        for i, line in enumerate(intrinsics):
+            K[i, :] = np.fromstring(line)
+        K[0] *= width_ratio
+        K[1] *= height_ratio
+        K_str = ""
+        for i, intrinsic in enumerate(K):
+            if i == 2 or i == 5:
+                K_str += intrinsic + "\n"
+            else:
+                K_str += intrinsic + " "
+
+        with open(camera_intrinsics, "w") as camera:
+            camera.write(K_str)
 
 
 def read_ply_points(ply_path):
