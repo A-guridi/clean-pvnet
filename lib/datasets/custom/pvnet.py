@@ -14,16 +14,32 @@ from lib.config import cfg
 # this is the dataset loaded for training with custom data
 class Dataset(data.Dataset):
 
-    def __init__(self, ann_file, data_root, split, transforms=None):
+    def __init__(self, ann_file, data_root, split, transforms=None, stokes_types=None):
         super(Dataset, self).__init__()
 
+        if stokes_types is None:
+            stokes_types = ["dolp.jpg", "aolp.jpg"]
         self.data_root = data_root
+        self.pol_data = os.path.join(self.data_root, "pol/")
         self.split = split
-
+        self.stokes_types = stokes_types
+        self.num_stokes=len(stokes_types)
         self.coco = COCO(ann_file)
         self.img_ids = np.array(sorted(self.coco.getImgIds()))
         self._transforms = transforms
         self.cfg = cfg
+
+    def read_pol_image(self, im_id):
+        images = []
+        for i in range(self.num_stokes):
+            im_path = os.path.join(self.pol_data, str(im_id - 1) + self.stokes_types[i])
+            im = Image.open(im_path).convert("1")
+            images.append(im)
+        res = np.zeros(shape=(images[0].width, images[0].height, self.num_stokes))
+        for i in range(self.num_stokes):
+            res[:, :, i] = np.array(images[i]).squeeze()
+
+        return res
 
     def read_data(self, img_id):
         ann_ids = self.coco.getAnnIds(imgIds=img_id)
@@ -67,7 +83,8 @@ class Dataset(data.Dataset):
         foreground = np.sum(mask)
         # randomly mask out to add occlusion
         if foreground > 0:
-            img, mask, hcoords = rotate_instance(img, mask, hcoords, self.cfg.train.rotate_min, self.cfg.train.rotate_max)
+            img, mask, hcoords = rotate_instance(img, mask, hcoords, self.cfg.train.rotate_min,
+                                                 self.cfg.train.rotate_max)
             img, mask, hcoords = crop_resize_instance_v1(img, mask, hcoords, height, width,
                                                          self.cfg.train.overlap_ratio,
                                                          self.cfg.train.resize_ratio_min,

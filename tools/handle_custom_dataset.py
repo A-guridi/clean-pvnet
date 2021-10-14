@@ -57,9 +57,9 @@ def resize_all_images(data_root):
 
         width_ratio = width / img.shape[1]
         height_ratio = height / img.shape[0]
-        # if width_ratio == 1 and height_ratio == 1:
-        #      print("No resizing is needed")
-        #      return
+        if width_ratio == 1 and height_ratio == 1:
+            print("No resizing is needed")
+            return
         img = cv2.resize(img, (width, height), interpolation=cv2.INTER_AREA)
         cv2.imwrite(im_path, img)
 
@@ -106,6 +106,7 @@ def create_polarized_pics(old_data_root, source_image_path):
 
     source_images_type = ["stokes_dolp.jpg", "stokes_aolp.jpg"]
     source_images = sorted(os.listdir(source_image_path))
+    source_images.remove("lava")        # this was a test folder not used anymore
     if not os.path.isdir(pol_path):
         os.mkdir(pol_path)
     elif os.path.isdir(pol_path) and len(os.listdir(pol_path)) > 0:
