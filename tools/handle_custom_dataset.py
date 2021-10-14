@@ -13,6 +13,7 @@ import cv2
 
 def transform_obj_to_ply(model_path):
     # added function to create a ply mesh from an obj mesh
+    print("Creating PLY file in ASCII format")
     new_path = model_path
     model_path = model_path[:-3] + "obj"
     mesh = trimesh.load(model_path)
@@ -20,13 +21,13 @@ def transform_obj_to_ply(model_path):
     output_file = open(new_path, "wb+")
     output_file.write(result)
     output_file.close()
+    print("PLY file successfully created")
 
 
 def resize_all_images(data_root):
     rgb_images = os.path.join(data_root, "rgb/")
     masks = os.path.join(data_root, "mask/")
     camera_intrinsics = os.path.join(data_root, "camera.txt")
-    new_cam = os.path.join(data_root, "camera2.txt")
     all_images = sorted(os.listdir(rgb_images))
     all_masks = sorted(os.listdir(masks))
     assert len(all_images) == len(all_masks), "Error, the len of all the images should be the same as the masks"
@@ -55,18 +56,17 @@ def resize_all_images(data_root):
         intrinsics = camera.readlines()
     K = np.zeros(shape=(3, 3))
     for i, line in enumerate(intrinsics):
-        print(line)
         K[i, :] = np.fromstring(line, dtype=float, sep=" ")
-    K[0] *= width_ratio
-    K[1] *= height_ratio
+    K[0, :] *= width_ratio
+    K[1, :] *= height_ratio
     K = K.flatten().tolist()
     K_str = ""
     for i, intrinsic in enumerate(K):
         if i == 2 or i == 5:
-            K_str += str(intrinsic) + "\n"
+            K_str += str(intrinsic).zfill(16) + "\n"
         else:
-            K_str += str(intrinsic) + " "
-    with open(new_cam, "w") as camera:
+            K_str += str(intrinsic).zfill(16) + " "
+    with open(camera_intrinsics, "w") as camera:
         camera.write(K_str)
     print("All images, mask and camera intrinsics have been resized to a multiple of 32")
 
