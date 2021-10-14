@@ -30,7 +30,7 @@ def resize_all_images(data_root):
     all_masks = sorted(os.listdir(masks))
     assert len(all_images) == len(all_masks), "Error, the len of all the images should be the same as the masks"
     print("Resizing all images, masks and camera")
-    for image, mask in zip(all_images, all_masks):
+    for image, mask in tqdm.tqdm(zip(all_images, all_masks)):
         # first we resize all the RGB images
         im_path = os.path.join(rgb_images, image)
         img = cv2.imread(im_path)
@@ -60,9 +60,9 @@ def resize_all_images(data_root):
         K_str = ""
         for i, intrinsic in enumerate(K):
             if i == 2 or i == 5:
-                K_str += intrinsic + "\n"
+                K_str += str(intrinsic) + "\n"
             else:
-                K_str += intrinsic + " "
+                K_str += str(intrinsic) + " "
 
         with open(camera_intrinsics, "w") as camera:
             camera.write(K_str)
