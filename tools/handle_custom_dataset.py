@@ -29,6 +29,7 @@ def resize_all_images(data_root):
     all_images = sorted(os.listdir(rgb_images))
     all_masks = sorted(os.listdir(masks))
     assert len(all_images) == len(all_masks), "Error, the len of all the images should be the same as the masks"
+    print("Resizing all images, masks and camera")
     for image, mask in zip(all_images, all_masks):
         # first we resize all the RGB images
         im_path = os.path.join(rgb_images, image)
@@ -65,6 +66,7 @@ def resize_all_images(data_root):
 
         with open(camera_intrinsics, "w") as camera:
             camera.write(K_str)
+    print("All images, mask and camera intrinsics have been resized to a multiple of 32")
 
 
 def read_ply_points(ply_path):
