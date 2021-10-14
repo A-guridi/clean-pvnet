@@ -42,6 +42,8 @@ def resize_all_images(data_root):
         img = cv2.imread(im_path)
         width = int(img.shape[1] - img.shape[1] % 32)
         height = int(img.shape[0] - img.shape[0] % 32)
+        width = min(width, height)
+        height = min(width, height)
 
         width_ratio = width / img.shape[1]
         height_ratio = height / img.shape[0]
