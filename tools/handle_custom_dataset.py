@@ -26,6 +26,7 @@ def resize_all_images(data_root):
     rgb_images = os.path.join(data_root, "rgb/")
     masks = os.path.join(data_root, "mask/")
     camera_intrinsics = os.path.join(data_root, "camera.txt")
+    new_cam = os.path.join(data_root, "camera2.txt")
     all_images = sorted(os.listdir(rgb_images))
     all_masks = sorted(os.listdir(masks))
     assert len(all_images) == len(all_masks), "Error, the len of all the images should be the same as the masks"
@@ -49,23 +50,24 @@ def resize_all_images(data_root):
         mask = cv2.resize(mask, (width, height), interpolation=cv2.INTER_AREA)
         cv2.imwrite(mask_path, mask)
 
-        # lastly we reshape the cameras intrinsics
-        with open(camera_intrinsics, "r") as camera:
-            intrinsics = camera.readlines()
-        K = np.zeros(shape=(3, 3))
-        for i, line in enumerate(intrinsics):
-            K[i, :] = np.fromstring(line, dtype=float, sep=" ")
-        K[0] *= width_ratio
-        K[1] *= height_ratio
-        K_str = ""
-        for i, intrinsic in enumerate(K):
-            if i == 2 or i == 5:
-                K_str += str(intrinsic) + "\n"
-            else:
-                K_str += str(intrinsic) + " "
-
-        with open(camera_intrinsics, "w") as camera:
-            camera.write(K_str)
+    # lastly we reshape the cameras intrinsics
+    with open(camera_intrinsics, "r") as camera:
+        intrinsics = camera.readlines()
+    K = np.zeros(shape=(3, 3))
+    for i, line in enumerate(intrinsics):
+        print(line)
+        K[i, :] = np.fromstring(line, dtype=float, sep=" ")
+    K[0] *= width_ratio
+    K[1] *= height_ratio
+    K = K.flatten().tolist()
+    K_str = ""
+    for i, intrinsic in enumerate(K):
+        if i == 2 or i == 5:
+            K_str += str(intrinsic) + "\n"
+        else:
+            K_str += str(intrinsic) + " "
+    with open(new_cam, "w") as camera:
+        camera.write(K_str)
     print("All images, mask and camera intrinsics have been resized to a multiple of 32")
 
 
