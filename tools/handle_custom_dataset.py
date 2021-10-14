@@ -1,4 +1,6 @@
 import os
+import shutil
+
 from plyfile import PlyData
 import numpy as np
 from lib.csrc.fps import fps_utils
@@ -24,12 +26,20 @@ def transform_obj_to_ply(model_path):
     print("PLY file successfully created")
 
 
+def run_all_custom(data_root):
+    # function to run all added custom functions to prepare the data before training
+    create_polarized_pics(data_root, "/home/arturo/renders/cup/mitsuba_cup/output/")
+    resize_all_images(data_root)
+
+
 def resize_all_images(data_root):
     rgb_images = os.path.join(data_root, "rgb/")
     masks = os.path.join(data_root, "mask/")
+    pol_images = os.path.join(data_root, "pol/")
     camera_intrinsics = os.path.join(data_root, "camera.txt")
     all_images = sorted(os.listdir(rgb_images))
     all_masks = sorted(os.listdir(masks))
+    all_polarization = sorted(os.listdir(pol_images))
     assert len(all_images) == len(all_masks), "Error, the len of all the images should be the same as the masks"
     print("Resizing all images, masks and camera")
     width = 0
@@ -47,9 +57,9 @@ def resize_all_images(data_root):
 
         width_ratio = width / img.shape[1]
         height_ratio = height / img.shape[0]
-        if width_ratio == 1 and height_ratio == 1:
-            print("No resizing is needed")
-            return
+        # if width_ratio == 1 and height_ratio == 1:
+        #      print("No resizing is needed")
+        #      return
         img = cv2.resize(img, (width, height), interpolation=cv2.INTER_AREA)
         cv2.imwrite(im_path, img)
 
@@ -58,6 +68,14 @@ def resize_all_images(data_root):
         mask = cv2.imread(mask_path)
         mask = cv2.resize(mask, (width, height), interpolation=cv2.INTER_AREA)
         cv2.imwrite(mask_path, mask)
+
+    # thirdly, we reshape on a separate loop all the polarized images ( because their length is not the same as RGB
+    # or mask )
+    for pol in all_polarization:
+        pol_path = os.path.join(pol_images, pol)
+        pol_img = cv2.imread(pol_path)
+        pol_img = cv2.resize(pol_img, (width, height), interpolation=cv2.INTER_AREA)
+        cv2.imwrite(pol_path, pol_img)
 
     # lastly we reshape the cameras intrinsics
     with open(camera_intrinsics, "r") as camera:
@@ -77,6 +95,30 @@ def resize_all_images(data_root):
     with open(camera_intrinsics, "w") as camera:
         camera.write(K_str)
     print(f"All images, mask and camera intrinsics have been resized to {width}x{height}")
+
+
+def create_polarized_pics(old_data_root, source_image_path):
+    # Copies the specified polarized images into the training path
+    # note, source_images should be the folder output from the rendering of mitsuba
+    # in it, 200 folders, one for each pose, and inside the folder all the images
+    print("Copying all images to a new polarization folder")
+    pol_path = os.path.join(old_data_root, "pol/")
+
+    source_images_type = ["stokes_dolp.jpg", "stokes_aolp.jpg"]
+    source_images = sorted(os.listdir(source_image_path))
+    if not os.path.isdir(pol_path):
+        os.mkdir(pol_path)
+    elif os.path.isdir(pol_path) and len(os.listdir(pol_path)) > 0:
+        print("All the images have already been copied")
+
+    for folder_image in source_images:
+        base_path = os.path.join(source_image_path, folder_image)
+        for image_type in source_images_type:
+            image_org = os.path.join(base_path, image_type)
+            dest = os.path.join(pol_path, str(folder_image) + image_type.strip("stokes"))
+            shutil.copy2(image_org, dest)
+
+    print("All the images were successfully copied")
 
 
 def read_ply_points(ply_path):

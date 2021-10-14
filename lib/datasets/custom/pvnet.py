@@ -11,6 +11,7 @@ import torch
 from lib.config import cfg
 
 
+# this is the dataset loaded for training with custom data
 class Dataset(data.Dataset):
 
     def __init__(self, ann_file, data_root, split, transforms=None):
