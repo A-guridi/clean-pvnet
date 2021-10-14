@@ -54,7 +54,7 @@ def resize_all_images(data_root):
             intrinsics = camera.readlines()
         K = np.zeros(shape=(3, 3))
         for i, line in enumerate(intrinsics):
-            K[i, :] = np.fromstring(line)
+            K[i, :] = np.fromstring(line, dtype=float, sep=" ")
         K[0] *= width_ratio
         K[1] *= height_ratio
         K_str = ""
