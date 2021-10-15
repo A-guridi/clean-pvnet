@@ -40,6 +40,8 @@ class Normalize(object):
         self.to_bgr = to_bgr
 
     def __call__(self, img, kpts, mask):
+        # added calculation of the mean values of the 2 additional channels on the fly
+        # usually values are mean=[0.002248, 0.002258] and std=[0.001851, 0.001850]
         n_mean = self.mean + [np.mean(img[:, :, 3]), np.mean(img[:, :, 4])]
         n_std = self.std + [np.std(img[:, :, 3]), np.std(img[:, :, 4])]
         img -= n_mean
@@ -49,6 +51,7 @@ class Normalize(object):
         return img, kpts, mask
 
 
+# suppressed because we want to keep the original colors of the input stokes parameters
 class ColorJitter(object):
 
     def __init__(self,

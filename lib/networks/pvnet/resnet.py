@@ -4,7 +4,6 @@ import torch.utils.model_zoo as model_zoo
 import numpy as np
 import torch
 
-
 __all__ = ['ResNet', 'resnet18', 'resnet34', 'resnet50', 'resnet101',
            'resnet152']
 
@@ -116,7 +115,7 @@ class ResNet(nn.Module):
 
     def __init__(self,
                  block,
-                 layers,
+                 layers,  # these are all 2 for resnet18
                  num_classes=1000,
                  fully_conv=False,
                  remove_avg_pool_layer=False,
@@ -137,7 +136,7 @@ class ResNet(nn.Module):
         super(ResNet, self).__init__()
         # modify here the number of input channels
         # previously was conv1
-        self.conv_input = nn.Conv2d(input_channels, 64, kernel_size=7, stride=2, padding=3,
+        self.conv_input = nn.Conv2d(3, 64, kernel_size=7, stride=2, padding=3,
                                     bias=False)
         self.bn1 = nn.BatchNorm2d(64)
         self.relu = nn.ReLU(inplace=True)
@@ -158,6 +157,25 @@ class ResNet(nn.Module):
             # method was changed and doesn't work as it used to be
             # self.fc = nn.Conv2d(512 * block.expansion, num_classes, 1)
 
+        # ADDED
+        # now to make the parallel backbone similar to the one existing already but taking as input the polarization
+        # images
+        self.conv_input2 = nn.Conv2d(input_channels - 3, 64, kernel_size=7, stride=2, padding=3,
+                                     bias=False)
+        self.bn2 = nn.BatchNorm2d(64)
+        self.relu2 = nn.ReLU(inplace=True)
+        self.maxpool2 = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
+
+        # now onto the layers
+        self.layer1_2 = self._make_layer(block, 64, layers[0])
+        self.layer2_2 = self._make_layer(block, 128, layers[1], stride=2)
+        self.layer3_2 = self._make_layer(block, 256, layers[2], stride=2)
+        self.layer4_2 = self._make_layer(block, 512, layers[3], stride=2)
+
+        # this concat layer will have an input of 512*2
+        self.inplanes *= 2
+        self.concat_layer = self._make_layer(block, 512, 2, stride=2)
+
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
                 n = m.kernel_size[0] * m.kernel_size[1] * m.out_channels
@@ -165,6 +183,16 @@ class ResNet(nn.Module):
             elif isinstance(m, nn.BatchNorm2d):
                 m.weight.data.fill_(1)
                 m.bias.data.zero_()
+
+    def initialize_pretrained_weights_bi_encoder(self):
+        # this function copies the weights from the normal backbone into the separate backbone
+        self.bn2.weight.data = self.bn1.weight.data
+        self.maxpool2.weight.data = self.maxpool.weight.data
+
+        self.layer1_2.weight.data = self.layer1.weight.data
+        self.layer2_2.weight.data = self.layer2.weight.data
+        self.layer3_2.weight.data = self.layer3.weight.data
+        self.layer4_2.weight.data = self.layer4.weight.data
 
     def _make_layer(self, block, planes, blocks, stride=1, dilation=1):
         downsample = None

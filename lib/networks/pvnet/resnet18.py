@@ -13,6 +13,7 @@ class Resnet18(nn.Module):
 
         # Load the pretrained weights, remove avg pool
         # layer and get the output stride of 8
+        # note that this was changed to adapt the input of the channels
         resnet18_8s = resnet18(fully_conv=True,
                                pretrained=True,
                                output_stride=8,
@@ -91,7 +92,7 @@ class Resnet18(nn.Module):
         fm=self.conv2s(torch.cat([fm,x2s],1))
         fm=self.up2storaw(fm)
 
-        x=self.convraw(torch.cat([fm,x],1))
+        x=self.convraw(torch.cat([fm,x],1))     # this layer was changed depending on the channels of input
         seg_pred=x[:,:self.seg_dim,:,:]
         ver_pred=x[:,self.seg_dim:,:,:]
 

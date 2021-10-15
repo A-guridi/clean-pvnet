@@ -69,8 +69,8 @@ class Dataset(data.Dataset):
         if self._transforms is not None:
             inp, kpt_2d, mask = self._transforms(inp, kpt_2d, mask)
 
+        # needs to be transposed to channel first type
         vertex = pvnet_data_utils.compute_vertex(mask, kpt_2d).transpose(2, 0, 1)
-        # vertex = pvnet_data_utils.compute_vertex(mask, kpt_2d)
         ret = {'inp': inp, 'mask': mask.astype(np.uint8), 'vertex': vertex, 'img_id': img_id, 'meta': {}}
         # visualize_utils.visualize_linemod_ann(torch.tensor(inp), kpt_2d, mask, True)
 
