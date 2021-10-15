@@ -23,21 +23,20 @@ class Dataset(data.Dataset):
         self.pol_data = os.path.join(self.data_root, "pol/")
         self.split = split
         self.stokes_types = stokes_types
-        self.num_stokes=len(stokes_types)
+        self.num_stokes = len(stokes_types)
         self.coco = COCO(ann_file)
         self.img_ids = np.array(sorted(self.coco.getImgIds()))
         self._transforms = transforms
         self.cfg = cfg
 
-    def read_pol_image(self, im_id):
-        images = []
+    def read_pol_image(self, im_id, im_width, im_height):
+        # images = []
+        res = np.zeros(shape=(im_width, im_height, self.num_stokes))
         for i in range(self.num_stokes):
             im_path = os.path.join(self.pol_data, str(im_id - 1) + self.stokes_types[i])
             im = Image.open(im_path).convert("1")
-            images.append(im)
-        res = np.zeros(shape=(images[0].width, images[0].height, self.num_stokes))
-        for i in range(self.num_stokes):
-            res[:, :, i] = np.array(images[i]).squeeze()
+            res[:, :, i] = np.array(im).squeeze()
+            # images.append(im)
 
         return res
 
@@ -51,6 +50,9 @@ class Dataset(data.Dataset):
 
         cls_idx = linemod_config.linemod_cls_names.index(anno['cls']) + 1
         mask = pvnet_data_utils.read_linemod_mask(anno['mask_path'], anno['type'], cls_idx)
+
+        pol_images = self.read_pol_image(img_id, inp.width, inp.height)
+        inp = np.concatenate(inp, pol_images, axis=2)
 
         return inp, kpt_2d, mask
 
