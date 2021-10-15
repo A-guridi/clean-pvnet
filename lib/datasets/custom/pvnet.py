@@ -52,7 +52,7 @@ class Dataset(data.Dataset):
         mask = pvnet_data_utils.read_linemod_mask(anno['mask_path'], anno['type'], cls_idx)
 
         pol_images = self.read_pol_image(img_id, inp.width, inp.height)
-        inp = np.concatenate(inp, pol_images, axis=2)
+        inp = np.concatenate((inp, pol_images), axis=2)
 
         return inp, kpt_2d, mask
 
