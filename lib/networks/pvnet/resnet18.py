@@ -8,7 +8,7 @@ from lib.config import cfg
 
 # apparently, this class is also used for creating the backbone of the network
 class Resnet18(nn.Module):
-    def __init__(self, ver_dim, seg_dim, fcdim=256, s8dim=128, s4dim=64, s2dim=32, raw_dim=32):
+    def __init__(self, ver_dim, seg_dim, fcdim=256, s8dim=128, s4dim=64, s2dim=32, raw_dim=32, input_channels=5):
         super(Resnet18, self).__init__()
 
         # Load the pretrained weights, remove avg pool
@@ -51,8 +51,9 @@ class Resnet18(nn.Module):
         )
         self.up4sto2s=nn.UpsamplingBilinear2d(scale_factor=2)
 
+        # modified here s2dim+input_channels
         self.convraw = nn.Sequential(
-            nn.Conv2d(3+s2dim, raw_dim, 3, 1, 1, bias=False),
+            nn.Conv2d(input_channels+s2dim, raw_dim, 3, 1, 1, bias=False),
             nn.BatchNorm2d(raw_dim),
             nn.LeakyReLU(0.1,True),
             nn.Conv2d(raw_dim, seg_dim+ver_dim, 1, 1)

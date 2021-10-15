@@ -42,8 +42,6 @@ class Normalize(object):
     def __call__(self, img, kpts, mask):
         n_mean = self.mean + [np.mean(img[:, :, 3]), np.mean(img[:, :, 4])]
         n_std = self.std + [np.std(img[:, :, 3]), np.std(img[:, :, 4])]
-        print(n_mean)
-        print(n_std)
         img -= n_mean
         img /= n_std
         if self.to_bgr:     # we put the channels first, then the rows and columns
