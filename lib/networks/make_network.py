@@ -31,4 +31,4 @@ def get_network(cfg):
 def make_network(cfg):
     module = '.'.join(['lib.networks', cfg.task])
     path = os.path.join('lib/networks', cfg.task, '__init__.py')
-    return imp.load_source(module, path).get_network(cfg)
+    return imp.load_source(module, path).get_network(cfg)       # this calls get resnet18 from networks/pvnet/__init__

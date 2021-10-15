@@ -120,7 +120,8 @@ class ResNet(nn.Module):
                  num_classes=1000,
                  fully_conv=False,
                  remove_avg_pool_layer=False,
-                 output_stride=32):
+                 output_stride=32,
+                 input_channels=5):
 
         # Add additional variables to track
         # output stride. Necessary to achieve
@@ -135,7 +136,8 @@ class ResNet(nn.Module):
         self.fully_conv = fully_conv
         super(ResNet, self).__init__()
         # modify here the number of input channels
-        self.conv1 = nn.Conv2d(3, 64, kernel_size=7, stride=2, padding=3,
+
+        self.conv1 = nn.Conv2d(input_channels, 64, kernel_size=7, stride=2, padding=3,
                                bias=False)
         self.bn1 = nn.BatchNorm2d(64)
         self.relu = nn.ReLU(inplace=True)

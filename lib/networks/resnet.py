@@ -105,6 +105,7 @@ class Bottleneck(nn.Module):
         return out
 
 
+# I think this is not used for the custom training
 class PoseResNet(nn.Module):
 
     def __init__(self, block, layers, heads, head_conv, **kwargs):
@@ -113,7 +114,7 @@ class PoseResNet(nn.Module):
         self.heads = heads
 
         super(PoseResNet, self).__init__()
-        input_layers = 5
+        input_layers = 3        # this is not used for the custom training
         self.conv1 = nn.Conv2d(input_layers, 64, kernel_size=7, stride=2, padding=3,
                                bias=False)
         self.bn1 = nn.BatchNorm2d(64, momentum=BN_MOMENTUM)

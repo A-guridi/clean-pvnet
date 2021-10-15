@@ -1,6 +1,6 @@
 # wait
 model: 'custom'
-model_dir: 'data/model_test'
+model_dir: 'data/model_test_together'
 network: 'res'
 heads: ''
 task: 'pvnet'

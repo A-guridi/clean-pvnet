@@ -6,6 +6,7 @@ from lib.csrc.ransac_voting.ransac_voting_gpu import ransac_voting_layer, ransac
 from lib.config import cfg
 
 
+# apparently, this class is also used for creating the backbone of the network
 class Resnet18(nn.Module):
     def __init__(self, ver_dim, seg_dim, fcdim=256, s8dim=128, s4dim=64, s2dim=32, raw_dim=32):
         super(Resnet18, self).__init__()
