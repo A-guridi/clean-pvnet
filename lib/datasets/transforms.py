@@ -40,8 +40,10 @@ class Normalize(object):
         self.to_bgr = to_bgr
 
     def __call__(self, img, kpts, mask):
-        img -= self.mean
-        img /= self.std
+        n_mean = self.mean + [np.mean(img[:, :, 3]), np.mean(img[:, :, 4])]
+        n_std = self.std + [np.std(img[:, :, 3]), np.std(img[:, :, 4])]
+        img -= n_mean
+        img /= n_std
         if self.to_bgr:
             img = img.transpose(2, 0, 1).astype(np.float32)
         return img, kpts, mask
@@ -59,7 +61,7 @@ class ColorJitter(object):
             brightness=brightness,
             contrast=contrast,
             saturation=saturation,
-            hue=hue,)
+            hue=hue, )
 
     def __call__(self, image, kpts, mask):
         image = np.asarray(self.color_jitter(Image.fromarray(np.ascontiguousarray(image, np.uint8))))
