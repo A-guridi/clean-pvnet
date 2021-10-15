@@ -83,16 +83,16 @@ def make_transforms(cfg, is_train):
         transform = Compose(
             [
                 RandomBlur(0.5),
-                ColorJitter(0.1, 0.1, 0.05, 0.05),
+                # ColorJitter(0.1, 0.1, 0.05, 0.05),
                 ToTensor(),
-                Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+                Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225], to_bgr=False),
             ]
         )
     else:
         transform = Compose(
             [
                 ToTensor(),
-                Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+                Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225], to_bgr=False),
             ]
         )
 
