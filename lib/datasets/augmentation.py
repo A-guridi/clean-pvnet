@@ -123,7 +123,7 @@ def crop_or_padding(img, mask, hcoords, hratio, wratio):
     return out_img, out_mask, hcoords,
 
 
-def crop_or_padding_to_fixed_size_instance(img, mask, hcoords, th, tw, overlap_ratio=0.5):
+def crop_or_padding_to_fixed_size_instance(img, mask, hcoords, th, tw, overlap_ratio=0.5, num_channels=5):
     h, w, _ = img.shape
     hs, ws = np.nonzero(mask)
 
@@ -151,7 +151,7 @@ def crop_or_padding_to_fixed_size_instance(img, mask, hcoords, th, tw, overlap_r
 
     if hpad or wpad:
         nh, nw, _ = img.shape
-        new_img = np.zeros([th, tw, 3], dtype=img.dtype)
+        new_img = np.zeros([th, tw, num_channels], dtype=img.dtype)
         new_mask = np.zeros([th, tw], dtype=mask.dtype)
 
         hbeg = 0 if not hpad else (th - h) // 2
@@ -264,7 +264,7 @@ def compute_resize_range(mask, hmin, hmax, wmin, wmax):
 
 #### higher level api #####
 def crop_resize_instance_v1(img, mask, hcoords, imheight, imwidth,
-                            overlap_ratio=0.5, ratio_min=0.8, ratio_max=1.2):
+                            overlap_ratio=0.5, ratio_min=0.8, ratio_max=1.2, num_channels=5):
     '''
 
     crop a region with [imheight*resize_ratio,imwidth*resize_ratio]
@@ -284,7 +284,7 @@ def crop_resize_instance_v1(img, mask, hcoords, imheight, imwidth,
     target_width = int(imwidth * resize_ratio)
 
     img, mask, hcoords = crop_or_padding_to_fixed_size_instance(
-        img, mask, hcoords, target_height, target_width, overlap_ratio)
+        img, mask, hcoords, target_height, target_width, overlap_ratio, num_channels=num_channels)
 
     img = cv2.resize(img, (imwidth, imheight), interpolation=cv2.INTER_LINEAR)
     mask = cv2.resize(mask, (imwidth, imheight), interpolation=cv2.INTER_NEAREST)

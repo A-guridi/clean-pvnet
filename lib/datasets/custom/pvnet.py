@@ -90,7 +90,8 @@ class Dataset(data.Dataset):
             img, mask, hcoords = crop_resize_instance_v1(img, mask, hcoords, height, width,
                                                          self.cfg.train.overlap_ratio,
                                                          self.cfg.train.resize_ratio_min,
-                                                         self.cfg.train.resize_ratio_max)
+                                                         self.cfg.train.resize_ratio_max,
+                                                         num_channels=3+self.num_stokes)
         else:
             img, mask = crop_or_padding_to_fixed_size(img, mask, height, width)
         kpt_2d = hcoords[:, :2]
