@@ -142,6 +142,8 @@ class ResNet(nn.Module):
         self.relu = nn.ReLU(inplace=True)
         self.maxpool = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
 
+        self.current_in_planes = self.inplanes
+
         self.layer1 = self._make_layer(block, 64, layers[0])
         self.layer2 = self._make_layer(block, 128, layers[1], stride=2)
         self.layer3 = self._make_layer(block, 256, layers[2], stride=2)
@@ -168,6 +170,7 @@ class ResNet(nn.Module):
         self.maxpool2 = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
 
         # now onto the layers
+        self.inplanes = self.current_in_planes
         self.layer1_2 = self._make_layer(block, 64, layers[0])
         self.layer2_2 = self._make_layer(block, 128, layers[1], stride=2)
         self.layer3_2 = self._make_layer(block, 256, layers[2], stride=2)
@@ -285,6 +288,7 @@ def resnet18(pretrained=False, **kwargs):
         model_dict.update(pretrained_dict)
         # 3. load the new state dict
         model.load_state_dict(model_dict)
+        model.initialize_pretrained_weights_bi_encoder()
     return model
 
 
