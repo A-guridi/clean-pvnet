@@ -188,18 +188,29 @@ class ResNet(nn.Module):
                 m.weight.data.fill_(1)
                 m.bias.data.zero_()
 
+    def copy_weights_from_block(self):
+        pass
+
     def initialize_pretrained_weights_bi_encoder(self):
         # this function copies the weights from the normal backbone into the separate backbone
         self.bn2.weight.data = self.bn1.weight.data
         print("Lay lengths:", len(self.layer1), len(self.layer2), len(self.layer3), len(self.layer4))
         for i in range(len(self.layer1)):
-            self.layer1_2[i].weight.data = self.layer1[i].weight.data
-        for i in range(len(self.layer2)):
-            self.layer2_2[i].weight.data = self.layer2[i].weight.data
-        for i in range(len(self.layer3)):
-            self.layer3_2[i].weight.data = self.layer3[i].weight.data
-        for i in range(len(self.layer4)):
-            self.layer4_2[i].weight.data = self.layer4[i].weight.data
+            pretrained_dict = self.layer1[i].state_dict()
+            self.layer1_2[i].update(pretrained_dict)
+            self.layer1_2[i].load_state_dict(pretrained_dict)
+
+            pretrained_dict = self.layer2[i].state_dict()
+            self.layer2_2[i].update(pretrained_dict)
+            self.layer2_2[i].load_state_dict(pretrained_dict)
+
+            pretrained_dict = self.layer3[i].state_dict()
+            self.layer3_2[i].update(pretrained_dict)
+            self.layer3_2[i].load_state_dict(pretrained_dict)
+
+            pretrained_dict = self.layer4[i].state_dict()
+            self.layer3_2[i].update(pretrained_dict)
+            self.layer4_2[i].load_state_dict(pretrained_dict)
 
     def _make_layer(self, block, planes, blocks, stride=1, dilation=1):
         downsample = None
