@@ -191,11 +191,15 @@ class ResNet(nn.Module):
     def initialize_pretrained_weights_bi_encoder(self):
         # this function copies the weights from the normal backbone into the separate backbone
         self.bn2.weight.data = self.bn1.weight.data
-
-        self.layer1_2.weight.data = self.layer1.weight.data
-        self.layer2_2.weight.data = self.layer2.weight.data
-        self.layer3_2.weight.data = self.layer3.weight.data
-        self.layer4_2.weight.data = self.layer4.weight.data
+        print("Lay lengths:", len(self.layer1), len(self.layer2), len(self.layer3), len(self.layer4))
+        for i in range(len(self.layer1)):
+            self.layer1_2[i].weight.data = self.layer1[i].weight.data
+        for i in range(len(self.layer2)):
+            self.layer2_2[i].weight.data = self.layer2[i].weight.data
+        for i in range(len(self.layer3)):
+            self.layer3_2[i].weight.data = self.layer3[i].weight.data
+        for i in range(len(self.layer4)):
+            self.layer4_2[i].weight.data = self.layer4[i].weight.data
 
     def _make_layer(self, block, planes, blocks, stride=1, dilation=1):
         downsample = None
