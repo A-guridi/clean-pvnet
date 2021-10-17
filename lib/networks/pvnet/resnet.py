@@ -153,6 +153,7 @@ class ResNet(nn.Module):
 
         if self.fully_conv:
             self.avgpool = nn.AvgPool2d(7, padding=3, stride=1)
+            self.avgpool2 = nn.AvgPool2d(7, padding=3, stride=1)
             # In the latest unstable torch 4.0 the tensor.copy_
             # method was changed and doesn't work as it used to be
             # self.fc = nn.Conv2d(512 * block.expansion, num_classes, 1)
@@ -229,24 +230,41 @@ class ResNet(nn.Module):
         return nn.Sequential(*layers)
 
     def forward(self, x):
-        x = self.conv_input(x)
-        x = self.bn1(x)
-        x2s = self.relu(x)
-        x = self.maxpool(x2s)
+        x_rgb, x_pol = torch.split(x, [3, 2])
+        # for the rgb part
+        x_rgb = self.conv_input(x_rgb)
+        x_rgb = self.bn1(x_rgb)
+        x2s = self.relu(x_rgb)
+        x_rgb = self.maxpool(x2s)
 
-        x4s = self.layer1(x)
+        x4s = self.layer1(x_rgb)
         x8s = self.layer2(x4s)
         x16s = self.layer3(x8s)
         x32s = self.layer4(x16s)
-        x = x32s
+        x_rgb = x32s
+
+        # for the polarized part
+        x_pol = self.conv_input2(x_pol)
+        x_pol = self.bn2(x_pol)
+        x2s_pol = self.relu(x_pol)
+        x_pol = self.maxpool2(x2s_pol)
+
+        x4s_pol = self.layer1_2(x_pol)
+        x8s_pol = self.layer2_2(x4s_pol)
+        x16s_pol = self.layer3_2(x8s_pol)
+        x32s_pol = self.layer4_2(x16s_pol)
+        x_pol = x32s_pol
+
+        # concatenate both and add up
+        x_out = self.concat_layer(torch.cat([x_rgb, x_pol], 1))
 
         if not self.remove_avg_pool_layer:
-            x = self.avgpool(x)
+            x_out = self.avgpool(x_out)
 
         if not self.fully_conv:
-            x = x.view(x.size(0), -1)
+            x_out = x_out.view(x_out.size(0), -1)
 
-        xfc = self.fc(x)
+        xfc = self.fc(x_out)
 
         return x2s, x4s, x8s, x16s, x32s, xfc
 
