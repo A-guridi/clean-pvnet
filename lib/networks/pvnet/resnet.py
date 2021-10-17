@@ -281,7 +281,7 @@ class ResNet(nn.Module):
 
         xfc = self.fc(x_out)
 
-        return x2s, x4s, x8s, x16s, x32s, xfc
+        return x2s, x4s, x8s, x16s, x32s, xfc, x2s_pol, x4s_pol, x8s_pol, x16s_pol, x32s_pol
 
 
 def resnet18(pretrained=False, **kwargs):

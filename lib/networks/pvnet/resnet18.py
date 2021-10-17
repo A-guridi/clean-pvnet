@@ -9,7 +9,8 @@ from lib.config import cfg
 
 # apparently, this class is also used for creating the backbone of the network
 class Resnet18(nn.Module):
-    def __init__(self, ver_dim, seg_dim, fcdim=256, s8dim=128, s4dim=64, s2dim=32, raw_dim=32, input_channels=5):
+    def __init__(self, ver_dim, seg_dim, fcdim=256, s8dim=128, s4dim=64, s2dim=32, raw_dim=32, input_channels=5,
+                 concat_polarization=True):
         super(Resnet18, self).__init__()
 
         # Load the pretrained weights, remove avg pool
@@ -22,6 +23,11 @@ class Resnet18(nn.Module):
 
         self.ver_dim = ver_dim
         self.seg_dim = seg_dim
+        self.concat_pol = concat_polarization
+        if self.concat_pol:
+            s8dim *= 2
+            s4dim *= 2
+            s2dim *= 2
 
         # Randomly initialize the 1x1 Conv scoring layer
         resnet18_8s.fc = nn.Sequential(
@@ -80,17 +86,17 @@ class Resnet18(nn.Module):
             output.update({'mask': mask, 'kpt_2d': kpt_2d})
 
     def forward(self, x, feature_alignment=False):
-        x2s, x4s, x8s, x16s, x32s, xfc = self.resnet18_8s(x)
+        x2s, x4s, x8s, x16s, x32s, xfc, x2s_pol, x4s_pol, x8s_pol, x16s_pol, x32s_pol = self.resnet18_8s(x)
 
-        fm = self.conv8s(torch.cat([xfc, x8s], 1))
+        fm = self.conv8s(torch.cat([xfc, x8s, x8s_pol], 1))
         fm = self.up8sto4s(fm)
         if fm.shape[2] == 136:
             fm = nn.functional.interpolate(fm, (135, 180), mode='bilinear', align_corners=False)
 
-        fm = self.conv4s(torch.cat([fm, x4s], 1))
+        fm = self.conv4s(torch.cat([fm, x4s, x4s_pol], 1))
         fm = self.up4sto2s(fm)
 
-        fm = self.conv2s(torch.cat([fm, x2s], 1))
+        fm = self.conv2s(torch.cat([fm, x2s, x2s_pol], 1))
         fm = self.up2storaw(fm)
 
         x = self.convraw(torch.cat([fm, x], 1))  # this layer was changed depending on the channels of input
