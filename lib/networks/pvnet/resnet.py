@@ -197,19 +197,15 @@ class ResNet(nn.Module):
         print("Lay lengths:", len(self.layer1), len(self.layer2), len(self.layer3), len(self.layer4))
         for i in range(len(self.layer1)):
             pretrained_dict = self.layer1[i].state_dict()
-            self.layer1_2[i].update(pretrained_dict)
             self.layer1_2[i].load_state_dict(pretrained_dict)
 
             pretrained_dict = self.layer2[i].state_dict()
-            self.layer2_2[i].update(pretrained_dict)
             self.layer2_2[i].load_state_dict(pretrained_dict)
 
             pretrained_dict = self.layer3[i].state_dict()
-            self.layer3_2[i].update(pretrained_dict)
             self.layer3_2[i].load_state_dict(pretrained_dict)
 
             pretrained_dict = self.layer4[i].state_dict()
-            self.layer3_2[i].update(pretrained_dict)
             self.layer4_2[i].load_state_dict(pretrained_dict)
 
     def _make_layer(self, block, planes, blocks, stride=1, dilation=1):
