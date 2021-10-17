@@ -269,8 +269,9 @@ class ResNet(nn.Module):
         x_pol = x32s_pol
 
         # concatenate both and add up
-        print("shapes", x_rgb.shape, x_pol.shape)
+        # until here two tensors of [4, 512, im.width, im.height]
         x_out = self.concat_layer(torch.cat([x_rgb, x_pol], 1))
+        # x_out.shape= [4, 512, im.width, im.height]
 
         if not self.remove_avg_pool_layer:
             x_out = self.avgpool(x_out)
