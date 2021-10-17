@@ -230,7 +230,7 @@ class ResNet(nn.Module):
         return nn.Sequential(*layers)
 
     def forward(self, x):
-        x_rgb, x_pol = torch.split(x, [3, 2])
+        x_rgb, x_pol = torch.split(x, [3, 2], dim=1)
         # for the rgb part
         x_rgb = self.conv_input(x_rgb)
         x_rgb = self.bn1(x_rgb)
