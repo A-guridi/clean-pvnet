@@ -7,11 +7,19 @@
 > CVPR 2019 oral  
 > [Project Page](https://zju3dv.github.io/pvnet)
 
-Any questions or discussions are welcomed!
+This is the custom implementation of PVNet for the Master Thesis project of Arturo Guridi at the Technical
+University Munich, chair of biomedical computing (CAMPAIR).
+
+This work focuses on changing PVNet to work with a custom input of both RGB and polarized images.
+For that purpose, first some images and annotations were generated using the Mitsuba Renderer with
+Blenderproc (please see [MitsubaRenderer](https://github.com/A-guridi/MistubaRenderer))
+
+The core functionalities of PVNet stay the same, with the need to pre-compile some libraries
+for using it.
 
 ## Introduction
 
-Thanks [Haotong Lin](https://github.com/haotongl) for providing the clean version of PVNet and reproducing the results.
+Thanks to [Haotong Lin](https://github.com/haotongl) for provinding a clean version of PVnet to use.
 
 The structure of this project is described in [project_structure.md](project_structure.md).
 
@@ -19,19 +27,20 @@ The structure of this project is described in [project_structure.md](project_str
 
 One way is to set up the environment with docker. See [this](https://github.com/zju3dv/clean-pvnet/tree/master/docker).
 
-Thanks **Floris Gaisser** for providing the docker implementation.
+Note that in contrast to the original PVNet, this work was tested with more modern version of the packages
+and proved to work just fine with CUDA 11.4 and pytorch 1.4
 
-Another way is to use the following commands.
+For the C++ cuda packages, CUDA 11.4 and g++ 9.0 was used and worked fine.
+No additional changes are needed to those files.
+
 
 1. Set up the python environment:
     ```
     conda create -n pvnet python=3.7
     conda activate pvnet
 
-    # install torch 1.1 built from cuda 9.0
-    pip install torch==1.1.0 -f https://download.pytorch.org/whl/cu90/stable
-
-    pip install Cython==0.28.2
+    # install torch 1.4 built from cuda 11
+   
     sudo apt-get install libglfw3-dev libglfw3
     pip install -r requirements.txt
     ```
@@ -59,27 +68,13 @@ Another way is to use the following commands.
     python setup.py build_ext --inplace
     ```
 3. Set up datasets:
-    ```
-    ROOT=/path/to/clean-pvnet
-    cd $ROOT/data
-    ln -s /path/to/linemod linemod
-    ln -s /path/to/linemod_orig linemod_orig
-    ln -s /path/to/occlusion_linemod occlusion_linemod
-
-    # the following is used for tless
-    ln -s /path/to/tless tless
-    ln -s /path/to/cache cache
-    ln -s /path/to/SUN2012pascalformat sun
-    ```
+   
+   The datasets from Linemod were not used, since it was tested with the custom dataset
+   from Mitsuba. Note that this implementation wont work with the standard datasets since it 
+   was programed to take also some polarized images as input.
+   
 
 Download datasets which are formatted for this project:
-1. [linemod](https://zjueducn-my.sharepoint.com/:u:/g/personal/pengsida_zju_edu_cn/EXK2K0B-QrNPi8MYLDFHdB8BQm9cWTxRGV9dQgauczkVYQ?e=beftUz)
-2. [linemod_orig](https://zjueducn-my.sharepoint.com/:u:/g/personal/pengsida_zju_edu_cn/EaoGIPguY3FAgrFKKhi32fcB_nrMcNRm8jVCZQd7G_-Wbg?e=ig4aHk): The dataset includes the depth for each image.
-3. [occlusion linemod](https://zjueducn-my.sharepoint.com/:u:/g/personal/pengsida_zju_edu_cn/ESXrP0zskd5IvvuvG3TXD-4BMgbDrHZ_bevurBrAcKE5Dg?e=r0EgoA)
-4. [truncation linemod](https://1drv.ms/u/s!AtZjYZ01QjphfuDICdni1IIM4SE): Check [TRUNCATION_LINEMOD.md](TRUNCATION_LINEMOD.md) for the information about the Truncation LINEMOD dataset.
-5. [Tless](https://zjueducn-my.sharepoint.com/:f:/g/personal/pengsida_zju_edu_cn/EsKEY3aHNElEjaKbhCJVyQgBUGTlprdcyF5sgLjEv8J8TQ?e=NbJpkM): `cat tlessa* | tar xvf - -C .`.
-6. [Tless cache data](https://zjueducn-my.sharepoint.com/:u:/g/personal/pengsida_zju_edu_cn/EWf-M5HRcH1JnBNN9yE1a84BYNAU7x1DoU_-W3Onl5Xxog?e=HZSrMu): It is used for training and testing on Tless.
-7. [SUN2012pascalformat](http://groups.csail.mit.edu/vision/SUN/releases/SUN2012pascalformat.tar.gz)
 
 ## Testing
 
