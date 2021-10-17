@@ -142,8 +142,6 @@ class ResNet(nn.Module):
         self.relu = nn.ReLU(inplace=True)
         self.maxpool = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
 
-        self.current_in_planes = self.inplanes
-
         self.layer1 = self._make_layer(block, 64, layers[0])
         self.layer2 = self._make_layer(block, 128, layers[1], stride=2)
         self.layer3 = self._make_layer(block, 256, layers[2], stride=2)
@@ -169,8 +167,10 @@ class ResNet(nn.Module):
         self.relu2 = nn.ReLU(inplace=True)
         self.maxpool2 = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
 
-        # now onto the layers
-        self.inplanes = self.current_in_planes
+        # now onto the polarization layers
+        self.inplanes = 64
+        self.current_stride = 4
+        self.current_dilation = 1
         self.layer1_2 = self._make_layer(block, 64, layers[0])
         self.layer2_2 = self._make_layer(block, 128, layers[1], stride=2)
         self.layer3_2 = self._make_layer(block, 256, layers[2], stride=2)
@@ -178,7 +178,7 @@ class ResNet(nn.Module):
 
         # this concat layer will have an input of 512*2
         self.inplanes *= 2
-        self.concat_layer = self._make_layer(block, 512, 2, stride=2)
+        self.concat_layer = self._make_layer(block, 512, 2, stride=1)
 
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
@@ -194,7 +194,7 @@ class ResNet(nn.Module):
     def initialize_pretrained_weights_bi_encoder(self):
         # this function copies the weights from the normal backbone into the separate backbone
         self.bn2.weight.data = self.bn1.weight.data
-        print("Lay lengths:", len(self.layer1), len(self.layer2), len(self.layer3), len(self.layer4))
+        # all have length 2 for the resnet18
         for i in range(len(self.layer1)):
             pretrained_dict = self.layer1[i].state_dict()
             self.layer1_2[i].load_state_dict(pretrained_dict)
@@ -269,6 +269,7 @@ class ResNet(nn.Module):
         x_pol = x32s_pol
 
         # concatenate both and add up
+        print("shapes", x_rgb.shape, x_pol.shape)
         x_out = self.concat_layer(torch.cat([x_rgb, x_pol], 1))
 
         if not self.remove_avg_pool_layer:
