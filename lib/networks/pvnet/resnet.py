@@ -191,7 +191,6 @@ class ResNet(nn.Module):
     def initialize_pretrained_weights_bi_encoder(self):
         # this function copies the weights from the normal backbone into the separate backbone
         self.bn2.weight.data = self.bn1.weight.data
-        self.maxpool2.weight.data = self.maxpool.weight.data
 
         self.layer1_2.weight.data = self.layer1.weight.data
         self.layer2_2.weight.data = self.layer2.weight.data
@@ -249,7 +248,7 @@ class ResNet(nn.Module):
         # for the polarized part
         x_pol = self.conv_input2(x_pol)
         x_pol = self.bn2(x_pol)
-        x2s_pol = self.relu(x_pol)
+        x2s_pol = self.relu2(x_pol)
         x_pol = self.maxpool2(x2s_pol)
 
         x4s_pol = self.layer1_2(x_pol)
