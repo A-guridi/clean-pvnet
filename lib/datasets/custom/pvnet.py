@@ -51,8 +51,9 @@ class Dataset(data.Dataset):
         cls_idx = linemod_config.linemod_cls_names.index(anno['cls']) + 1
         mask = pvnet_data_utils.read_linemod_mask(anno['mask_path'], anno['type'], cls_idx)
 
-        pol_images = self.read_pol_image(img_id, inp.width, inp.height)
-        inp = np.concatenate((inp, pol_images), axis=2)
+        if self.split == "train":
+            pol_images = self.read_pol_image(img_id, inp.width, inp.height)
+            inp = np.concatenate((inp, pol_images), axis=2)
 
         return inp, kpt_2d, mask
 
@@ -92,7 +93,7 @@ class Dataset(data.Dataset):
                                                          self.cfg.train.overlap_ratio,
                                                          self.cfg.train.resize_ratio_min,
                                                          self.cfg.train.resize_ratio_max,
-                                                         num_channels=3+self.num_stokes)
+                                                         num_channels=3 + self.num_stokes)
         else:
             img, mask = crop_or_padding_to_fixed_size(img, mask, height, width)
         kpt_2d = hcoords[:, :2]
