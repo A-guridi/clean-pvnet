@@ -32,7 +32,8 @@ class ToTensor(object):
         return np.asarray(img).astype(np.float32) / 255., kpts, mask
 
 
-class Normalize(object):
+class NormalizeTraining(object):
+    # this is the one with polarized images
 
     def __init__(self, mean, std, to_bgr=True):
         self.mean = mean
@@ -46,7 +47,25 @@ class Normalize(object):
         n_std = self.std + [np.std(img[:, :, 3]), np.std(img[:, :, 4])]
         img -= n_mean
         img /= n_std
-        if self.to_bgr:     # we put the channels first, then the rows and columns
+        if self.to_bgr:  # we put the channels first, then the rows and columns
+            img = img.transpose(2, 0, 1).astype(np.float32)
+        return img, kpts, mask
+
+
+class NormalizeTest(object):
+    # this is the one for testing with only RGB
+
+    def __init__(self, mean, std, to_bgr=True):
+        self.mean = mean
+        self.std = std
+        self.to_bgr = to_bgr
+
+    def __call__(self, img, kpts, mask):
+        # added calculation of the mean values of the 2 additional channels on the fly
+        # usually values are mean=[0.002248, 0.002258] and std=[0.001851, 0.001850]
+        img -= self.mean
+        img /= self.std
+        if self.to_bgr:  # we put the channels first, then the rows and columns
             img = img.transpose(2, 0, 1).astype(np.float32)
         return img, kpts, mask
 
@@ -90,14 +109,14 @@ def make_transforms(cfg, is_train):
                 RandomBlur(0.5),
                 # ColorJitter(0.1, 0.1, 0.05, 0.05),
                 ToTensor(),
-                Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225], to_bgr=True),
+                NormalizeTraining(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225], to_bgr=True),
             ]
         )
     else:
         transform = Compose(
             [
                 ToTensor(),
-                Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225], to_bgr=True),
+                NormalizeTest(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225], to_bgr=True),
             ]
         )
 

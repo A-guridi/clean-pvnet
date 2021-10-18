@@ -243,7 +243,10 @@ class ResNet(nn.Module):
         return nn.Sequential(*layers)
 
     def forward(self, x):
-        x_rgb, x_pol = torch.split(x, [3, 2], dim=1)
+        if self.training:
+            x_rgb, x_pol = torch.split(x, [3, 2], dim=1)
+        else:
+            x_rgb = x
         # for the rgb part
         x_rgb = self.conv_input(x_rgb)
         x_rgb = self.bn1(x_rgb)
@@ -257,31 +260,39 @@ class ResNet(nn.Module):
         x_rgb = x32s
 
         # for the polarized part
-        x_pol = self.conv_input2(x_pol)
-        x_pol = self.bn2(x_pol)
-        x2s_pol = self.relu2(x_pol)
-        x_pol = self.maxpool2(x2s_pol)
+        if self.training:
+            x_pol = self.conv_input2(x_pol)
+            x_pol = self.bn2(x_pol)
+            x2s_pol = self.relu2(x_pol)
+            x_pol = self.maxpool2(x2s_pol)
 
-        x4s_pol = self.layer1_2(x_pol)
-        x8s_pol = self.layer2_2(x4s_pol)
-        x16s_pol = self.layer3_2(x8s_pol)
-        x32s_pol = self.layer4_2(x16s_pol)
-        x_pol = x32s_pol
+            x4s_pol = self.layer1_2(x_pol)
+            x8s_pol = self.layer2_2(x4s_pol)
+            x16s_pol = self.layer3_2(x8s_pol)
+            x32s_pol = self.layer4_2(x16s_pol)
+            x_pol = x32s_pol
 
-        # concatenate both and add up
-        # until here two tensors of [4, 512, im.width, im.height]
-        x_out = self.concat_layer(torch.cat([x_rgb, x_pol], 1))
-        # x_out.shape= [4, 512, im.width, im.height]
+            # concatenate both and add up
+            # until here two tensors of [4, 512, im.width, im.height]
+            x_out = self.concat_layer(torch.cat([x_rgb, x_pol], 1))
+            # x_out.shape= [4, 512, im.width, im.height]
+
+        else:
+            x_out = x_rgb
+            x2s_pol, x4s_pol, x8s_pol, x16s_pol, x32s_pol = None, None, None, None, None
 
         if not self.remove_avg_pool_layer:
             x_out = self.avgpool(x_out)
+            x_rgb = self.avgpool(x_rgb)
 
         if not self.fully_conv:
             x_out = x_out.view(x_out.size(0), -1)
+            x_rgb = x_rgb.view(x_rgb.size(0), -1)
 
         xfc = self.fc(x_out)
+        x_rgb = self.fc(x_rgb)
 
-        return x2s, x4s, x8s, x16s, x32s, xfc, x2s_pol, x4s_pol, x8s_pol, x16s_pol, x32s_pol
+        return x2s, x4s, x8s, x16s, x32s, x_rgb, xfc, x2s_pol, x4s_pol, x8s_pol, x16s_pol, x32s_pol
 
 
 def resnet18(pretrained=False, **kwargs):

@@ -387,15 +387,15 @@ def augmentation(rgb, mask, hcoords, height, width, split):
         img_transforms = transforms.Compose([
             transforms.ColorJitter(0.1, 0.1, 0.05, 0.05),
             transforms.ToTensor(),
-            transforms.Normalize(mean=[0.485, 0.456, 0.406],
-                                 std=[0.229, 0.224, 0.225])
+            transforms.Normalize_training(mean=[0.485, 0.456, 0.406],
+                                          std=[0.229, 0.224, 0.225])
         ])
         rgb = img_transforms(Image.fromarray(np.ascontiguousarray(rgb, np.uint8)))
     else:
         test_img_transforms = transforms.Compose([
             transforms.ToTensor(),
-            transforms.Normalize(mean=[0.485, 0.456, 0.406],
-                                 std=[0.229, 0.224, 0.225])
+            transforms.Normalize_training(mean=[0.485, 0.456, 0.406],
+                                          std=[0.229, 0.224, 0.225])
         ])
         rgb = test_img_transforms(Image.fromarray(np.ascontiguousarray(rgb, np.uint8)))
     return rgb, mask, hcoords

@@ -24,10 +24,7 @@ class Resnet18(nn.Module):
         self.ver_dim = ver_dim
         self.seg_dim = seg_dim
         self.concat_pol = concat_polarization
-        if self.concat_pol:
-            s8dim *= 2
-            s4dim *= 2
-            s2dim *= 2
+        self.input_channels = input_channels
 
         # Randomly initialize the 1x1 Conv scoring layer
         resnet18_8s.fc = nn.Sequential(
@@ -36,8 +33,14 @@ class Resnet18(nn.Module):
             nn.ReLU(True)
         )
         self.resnet18_8s = resnet18_8s
-
+        # Here we differentiate between two kinds of layers, the ones
+        # who concatenate the input from polarization too, and the ones who only take the RGB input
         # x8s->128
+        self.conv8s_pol = nn.Sequential(
+            nn.Conv2d(128 + fcdim * 2, s8dim, 3, 1, 1, bias=False),
+            nn.BatchNorm2d(s8dim),
+            nn.LeakyReLU(0.1, True)
+        )
         self.conv8s = nn.Sequential(
             nn.Conv2d(128 + fcdim, s8dim, 3, 1, 1, bias=False),
             nn.BatchNorm2d(s8dim),
@@ -45,6 +48,11 @@ class Resnet18(nn.Module):
         )
         self.up8sto4s = nn.UpsamplingBilinear2d(scale_factor=2)
         # x4s->64
+        self.conv4s_pol = nn.Sequential(
+            nn.Conv2d(64 + s8dim * 2, s4dim, 3, 1, 1, bias=False),
+            nn.BatchNorm2d(s4dim),
+            nn.LeakyReLU(0.1, True)
+        )
         self.conv4s = nn.Sequential(
             nn.Conv2d(64 + s8dim, s4dim, 3, 1, 1, bias=False),
             nn.BatchNorm2d(s4dim),
@@ -52,6 +60,11 @@ class Resnet18(nn.Module):
         )
 
         # x2s->64
+        self.conv2s_pol = nn.Sequential(
+            nn.Conv2d(64 + s4dim * 2, s2dim, 3, 1, 1, bias=False),
+            nn.BatchNorm2d(s2dim),
+            nn.LeakyReLU(0.1, True)
+        )
         self.conv2s = nn.Sequential(
             nn.Conv2d(64 + s4dim, s2dim, 3, 1, 1, bias=False),
             nn.BatchNorm2d(s2dim),
@@ -60,8 +73,14 @@ class Resnet18(nn.Module):
         self.up4sto2s = nn.UpsamplingBilinear2d(scale_factor=2)
 
         # modified here s2dim+input_channels
+        self.convraw_pol = nn.Sequential(
+            nn.Conv2d(self.input_channels + s2dim, raw_dim, 3, 1, 1, bias=False),
+            nn.BatchNorm2d(raw_dim),
+            nn.LeakyReLU(0.1, True),
+            nn.Conv2d(raw_dim, seg_dim + ver_dim, 1, 1)
+        )
         self.convraw = nn.Sequential(
-            nn.Conv2d(input_channels + s2dim, raw_dim, 3, 1, 1, bias=False),
+            nn.Conv2d(3 + s2dim, raw_dim, 3, 1, 1, bias=False),
             nn.BatchNorm2d(raw_dim),
             nn.LeakyReLU(0.1, True),
             nn.Conv2d(raw_dim, seg_dim + ver_dim, 1, 1)
@@ -86,24 +105,47 @@ class Resnet18(nn.Module):
             output.update({'mask': mask, 'kpt_2d': kpt_2d})
 
     def forward(self, x, feature_alignment=False):
-        x2s, x4s, x8s, x16s, x32s, xfc, x2s_pol, x4s_pol, x8s_pol, x16s_pol, x32s_pol = self.resnet18_8s(x)
+        # x_rgb is just the normal RGB encoder while xfc is the combination of both feature maps
+        x2s, x4s, x8s, x16s, x32s, x_rgb, xfc, x2s_pol, x4s_pol, x8s_pol, x16s_pol, x32s_pol = self.resnet18_8s(x)
 
-        fm = self.conv8s(torch.cat([xfc, x8s, x8s_pol], 1))
-        fm = self.up8sto4s(fm)
-        if fm.shape[2] == 136:
-            fm = nn.functional.interpolate(fm, (135, 180), mode='bilinear', align_corners=False)
+        if self.training:
+            # on training, xfc is the combination of both feature maps from RGB and polarization
+            fm = self.conv8s_pol(torch.cat([xfc, x8s, x8s_pol], 1))
+            fm = self.up8sto4s(fm)
+            if fm.shape[2] == 136:
+                fm = nn.functional.interpolate(fm, (135, 180), mode='bilinear', align_corners=False)
 
-        fm = self.conv4s(torch.cat([fm, x4s, x4s_pol], 1))
-        fm = self.up4sto2s(fm)
+            fm = self.conv4s_pol(torch.cat([fm, x4s, x4s_pol], 1))
+            fm = self.up4sto2s(fm)
+            fm = self.conv2s_pol(torch.cat([fm, x2s, x2s_pol], 1))
+            fm = self.up2storaw(fm)
+            x = self.convraw_pol(torch.cat([fm, x], 1))  # this layer was changed depending on the channels of input
 
-        fm = self.conv2s(torch.cat([fm, x2s, x2s_pol], 1))
-        fm = self.up2storaw(fm)
+            xfc = x_rgb
+            # when training, we change the value of xfc once used so the RGB decoder (conv8s) gets only
+            # the RGB input. On testing, xfc will automatically be the output of the RGB encoder only
 
-        x = self.convraw(torch.cat([fm, x], 1))  # this layer was changed depending on the channels of input
-        seg_pred = x[:, :self.seg_dim, :, :]
-        ver_pred = x[:, self.seg_dim:, :, :]
+        fm_rgb = self.conv8s(torch.cat([xfc, x8s], 1))
+        fm_rgb = self.up8sto4s(fm_rgb)
+        if fm_rgb.shape[2] == 136:
+            fm_rgb = nn.functional.interpolate(fm_rgb, (135, 180), mode='bilinear', align_corners=False)
+        fm_rgb = self.conv4s(torch.cat([fm_rgb, x4s], 1))
+        fm_rgb = self.up4sto2s(fm_rgb)
+        fm_rgb = self.conv2s_pol(torch.cat([fm_rgb, x2s], 1))
+        fm_rgb = self.up2storaw(fm_rgb)
+        out_rgb = self.convraw(torch.cat([fm_rgb, x], 1))
 
-        ret = {'seg': seg_pred, 'vertex': ver_pred}
+        # we have now 2 outputs from 2 decoders, which will be fed to two different PnP algorithms and their
+        # Losses added
+        seg_pred_rgb = out_rgb[:, :self.seg_dim, :, :]
+        ver_pred_rgb = out_rgb[:, self.seg_dim:, :, :]
+
+        ret = {'seg': seg_pred_rgb, 'vertex': ver_pred_rgb}
+
+        if self.training:
+            seg_pred_pol = x[:, :self.seg_dim, :, :]
+            ver_pred_pol = x[:, self.seg_dim:, :, :]
+            ret.update({'seg_pol': seg_pred_pol, 'vertex_pol': ver_pred_pol})
 
         if not self.training:
             with torch.no_grad():

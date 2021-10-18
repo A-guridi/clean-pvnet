@@ -23,15 +23,29 @@ class NetworkWrapper(nn.Module):
             return output, loss, {}, {}
 
         weight = batch['mask'][:, None].float()
+        # for the RGB output
         vote_loss = self.vote_crit(output['vertex'] * weight, batch['vertex'] * weight, reduction='sum')
         vote_loss = vote_loss / weight.sum() / batch['vertex'].size(1)
         scalar_stats.update({'vote_loss': vote_loss})
         loss += vote_loss
 
+        # for the polarization output
+        vote_loss_pol = self.vote_crit(output['vertex_pol'] * weight, batch['vertex'] * weight, reduction='sum')
+        vote_loss_pol = vote_loss_pol / weight.sum() / batch['vertex'].size(1)
+        scalar_stats.update({'vote_loss_pol': vote_loss_pol})
+        loss += vote_loss_pol
+
+        # for the RBG
         mask = batch['mask'].long()
         seg_loss = self.seg_crit(output['seg'], mask)
         scalar_stats.update({'seg_loss': seg_loss})
         loss += seg_loss
+
+        # for the polarization
+        seg_loss_pol = self.seg_crit(output['seg_pol'], mask)
+        scalar_stats.update({'seg_loss_pol': seg_loss_pol})
+        loss += seg_loss_pol
+
 
         scalar_stats.update({'loss': loss})
         image_stats = {}
