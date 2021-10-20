@@ -35,9 +35,9 @@ class Resnet18(nn.Module):
         self.resnet18_8s = resnet18_8s
         # Here we differentiate between two kinds of layers, the ones
         # who concatenate the input from polarization too, and the ones who only take the RGB input
-        # x8s->128
+        # x8s->128, hence we multiply it by 2 because we combine x8s with x8s_pol in the polarized part
         self.conv8s_pol = nn.Sequential(
-            nn.Conv2d(128 + fcdim * 2, s8dim, 3, 1, 1, bias=False),
+            nn.Conv2d(128 * 2 + fcdim, s8dim, 3, 1, 1, bias=False),
             nn.BatchNorm2d(s8dim),
             nn.LeakyReLU(0.1, True)
         )
@@ -49,7 +49,7 @@ class Resnet18(nn.Module):
         self.up8sto4s = nn.UpsamplingBilinear2d(scale_factor=2)
         # x4s->64
         self.conv4s_pol = nn.Sequential(
-            nn.Conv2d(64 + s8dim * 2, s4dim, 3, 1, 1, bias=False),
+            nn.Conv2d(64 * 2 + s8dim, s4dim, 3, 1, 1, bias=False),
             nn.BatchNorm2d(s4dim),
             nn.LeakyReLU(0.1, True)
         )
@@ -61,7 +61,7 @@ class Resnet18(nn.Module):
 
         # x2s->64
         self.conv2s_pol = nn.Sequential(
-            nn.Conv2d(64 + s4dim * 2, s2dim, 3, 1, 1, bias=False),
+            nn.Conv2d(64 * 2 + s4dim * 2, s2dim, 3, 1, 1, bias=False),
             nn.BatchNorm2d(s2dim),
             nn.LeakyReLU(0.1, True)
         )

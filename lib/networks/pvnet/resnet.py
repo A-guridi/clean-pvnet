@@ -263,13 +263,13 @@ class ResNet(nn.Module):
         if self.training:
             x_pol = self.conv_input2(x_pol)
             x_pol = self.bn2(x_pol)
-            x2s_pol = self.relu2(x_pol)
+            x2s_pol = self.relu2(x_pol)             # shape 64
             x_pol = self.maxpool2(x2s_pol)
 
-            x4s_pol = self.layer1_2(x_pol)
-            x8s_pol = self.layer2_2(x4s_pol)
-            x16s_pol = self.layer3_2(x8s_pol)
-            x32s_pol = self.layer4_2(x16s_pol)
+            x4s_pol = self.layer1_2(x_pol)          # shape 64
+            x8s_pol = self.layer2_2(x4s_pol)        # shape 128
+            x16s_pol = self.layer3_2(x8s_pol)       # shape 256
+            x32s_pol = self.layer4_2(x16s_pol)      # shape 512
             x_pol = x32s_pol
 
             # concatenate both and add up
@@ -303,7 +303,7 @@ def resnet18(pretrained=False, **kwargs):
     """
     model = ResNet(BasicBlock, [2, 2, 2, 2], **kwargs)
     if pretrained:
-        print("Loading pretrained weights")
+        print("Loading pretrained weights for resnet18 encoder")
         pretrained_dict = model_zoo.load_url(model_urls['resnet18'])
         model_dict = model.state_dict()
         # 1. filter out unnecessary keys
