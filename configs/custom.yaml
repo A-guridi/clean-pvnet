@@ -21,6 +21,7 @@ train:
     rotate_max: 30
     weight_decay: 0.
     batch_sampler: 'image_size'
+    stokes_params: ["_dolp.jpg", "_aolp.jpg"]
 test:
     dataset: 'CustomTest'
     batch_size: 1

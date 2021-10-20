@@ -18,7 +18,7 @@ class Dataset(data.Dataset):
         super(Dataset, self).__init__()
 
         if stokes_types is None:
-            stokes_types = ["_dolp.jpg", "_aolp.jpg"]
+            stokes_types = cfg.stokes_params
         self.data_root = data_root
         self.pol_data = os.path.join(self.data_root, "pol/")
         self.split = split
