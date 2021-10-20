@@ -61,7 +61,7 @@ class Resnet18(nn.Module):
 
         # x2s->64
         self.conv2s_pol = nn.Sequential(
-            nn.Conv2d(64 * 2 + s4dim * 2, s2dim, 3, 1, 1, bias=False),
+            nn.Conv2d(64 * 2 + s4dim, s2dim, 3, 1, 1, bias=False),
             nn.BatchNorm2d(s2dim),
             nn.LeakyReLU(0.1, True)
         )
