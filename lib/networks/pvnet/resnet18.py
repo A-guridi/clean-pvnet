@@ -119,7 +119,7 @@ class Resnet18(nn.Module):
             fm = self.up4sto2s(fm)
             fm = self.conv2s_pol(torch.cat([fm, x2s, x2s_pol], 1))
             fm = self.up2storaw(fm)
-            x = self.convraw_pol(torch.cat([fm, x], 1))  # this layer was changed depending on the channels of input
+            out_pol = self.convraw_pol(torch.cat([fm, x], 1))  # this layer was changed depending on the channels of input
 
             xfc = x_rgb
             # when training, we change the value of xfc once used so the RGB decoder (conv8s) gets only
@@ -131,7 +131,7 @@ class Resnet18(nn.Module):
             fm_rgb = nn.functional.interpolate(fm_rgb, (135, 180), mode='bilinear', align_corners=False)
         fm_rgb = self.conv4s(torch.cat([fm_rgb, x4s], 1))
         fm_rgb = self.up4sto2s(fm_rgb)
-        fm_rgb = self.conv2s_pol(torch.cat([fm_rgb, x2s], 1))
+        fm_rgb = self.conv2s(torch.cat([fm_rgb, x2s], 1))
         fm_rgb = self.up2storaw(fm_rgb)
         out_rgb = self.convraw(torch.cat([fm_rgb, x], 1))
 
@@ -143,8 +143,8 @@ class Resnet18(nn.Module):
         ret = {'seg': seg_pred_rgb, 'vertex': ver_pred_rgb}
 
         if self.training:
-            seg_pred_pol = x[:, :self.seg_dim, :, :]
-            ver_pred_pol = x[:, self.seg_dim:, :, :]
+            seg_pred_pol = out_pol[:, :self.seg_dim, :, :]
+            ver_pred_pol = out_pol[:, self.seg_dim:, :, :]
             ret.update({'seg_pol': seg_pred_pol, 'vertex_pol': ver_pred_pol})
 
         if not self.training:
