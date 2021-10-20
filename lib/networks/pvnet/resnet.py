@@ -303,6 +303,7 @@ def resnet18(pretrained=False, **kwargs):
     """
     model = ResNet(BasicBlock, [2, 2, 2, 2], **kwargs)
     if pretrained:
+        print("Loading pretrained weights")
         pretrained_dict = model_zoo.load_url(model_urls['resnet18'])
         model_dict = model.state_dict()
         # 1. filter out unnecessary keys
