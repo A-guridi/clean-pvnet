@@ -20,14 +20,15 @@ class Dataset(data.Dataset):
         self.data_root = data_root
         self.pol_data = os.path.join(self.data_root, "pol/")
         self.split = split
-        self.stokes_types = stokes_types
-        self.num_stokes = len(stokes_types)
         self.coco = COCO(ann_file)
         self.img_ids = np.array(sorted(self.coco.getImgIds()))
         self._transforms = transforms
         self.cfg = cfg
         if stokes_types is None:
             stokes_types = self.cfg.train.stokes_params
+        self.stokes_types = stokes_types
+        self.num_stokes = len(stokes_types)
+        print("Late fusion with stokes parameters:", self.stokes_types)
 
     def read_pol_image(self, im_id, im_width, im_height):
         # images = []

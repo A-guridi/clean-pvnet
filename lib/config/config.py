@@ -67,7 +67,7 @@ cfg.train.resize_ratio_max = 1.2
 cfg.train.batch_sampler = ''
 
 # added for polarization
-cfg.train.stokes_params = None
+cfg.train.stokes_params = []
 
 # test
 cfg.test = CN()
