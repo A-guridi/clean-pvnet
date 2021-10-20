@@ -53,7 +53,7 @@ cfg.train.gamma = 0.5
 
 cfg.train.batch_size = 4
 
-#augmentation
+# augmentation
 cfg.train.affine_rate = 0.
 cfg.train.cropresize_rate = 0.
 cfg.train.rotate_rate = 0.
@@ -65,6 +65,9 @@ cfg.train.resize_ratio_min = 0.8
 cfg.train.resize_ratio_max = 1.2
 
 cfg.train.batch_sampler = ''
+
+# added for polarization
+cfg.train.stokes_params = None
 
 # test
 cfg.test = CN()
