@@ -122,6 +122,7 @@ class Resnet18(nn.Module):
             out_pol = self.convraw_pol(torch.cat([fm, x], 1))  # this layer was changed depending on the channels of input
 
             xfc = x_rgb
+            x, _ = torch.split(x, [3, 2], dim=1)
             # when training, we change the value of xfc once used so the RGB decoder (conv8s) gets only
             # the RGB input. On testing, xfc will automatically be the output of the RGB encoder only
 
@@ -148,7 +149,7 @@ class Resnet18(nn.Module):
             ret.update({'seg_pol': seg_pred_pol, 'vertex_pol': ver_pred_pol})
 
         if not self.training:
-            with torch.no_grad():
+            with torch.no_grad():       # this is because the PnP algorithm is not differentiable -> no gradient
                 self.decode_keypoint(ret)
 
         return ret
