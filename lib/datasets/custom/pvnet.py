@@ -17,8 +17,6 @@ class Dataset(data.Dataset):
     def __init__(self, ann_file, data_root, split, transforms=None, stokes_types=None):
         super(Dataset, self).__init__()
 
-        if stokes_types is None:
-            stokes_types = cfg.stokes_params
         self.data_root = data_root
         self.pol_data = os.path.join(self.data_root, "pol/")
         self.split = split
@@ -28,6 +26,8 @@ class Dataset(data.Dataset):
         self.img_ids = np.array(sorted(self.coco.getImgIds()))
         self._transforms = transforms
         self.cfg = cfg
+        if stokes_types is None:
+            stokes_types = self.cfg.train.stokes_params
 
     def read_pol_image(self, im_id, im_width, im_height):
         # images = []
