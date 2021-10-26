@@ -11,8 +11,8 @@ class NetworkWrapper(nn.Module):
         self.net = net
 
         self.vote_crit = torch.nn.functional.smooth_l1_loss
-        # self.seg_crit = nn.CrossEntropyLoss()
-        self.focal_crit = net_utils.FocalLoss()
+        self.seg_crit = nn.CrossEntropyLoss()
+        # self.focal_crit = net_utils.FocalLoss()
 
     def forward(self, batch):
         output = self.net(batch['inp'])
@@ -40,13 +40,13 @@ class NetworkWrapper(nn.Module):
 
         # for the RBG
         mask = batch['mask'].long()
-        seg_loss = self.focal_crit(output['seg'], mask)
+        seg_loss = self.seg_crit(output['seg'], mask)
         scalar_stats.update({'seg_loss': seg_loss})
         loss += seg_loss
 
         # for the polarization
         if self.training:
-            seg_loss_pol = self.focal_crit(output['seg_pol'], mask)
+            seg_loss_pol = self.seg_crit(output['seg_pol'], mask)
             scalar_stats.update({'seg_loss_pol': seg_loss_pol})
             loss += seg_loss_pol
 
