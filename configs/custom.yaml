@@ -1,11 +1,11 @@
 # wait
 model: 'custom'
-model_dir: 'data/model_test_first_bi_encoder'
+model_dir: 'data/model_lf_a+d'
 network: 'res'
 heads: ''
 task: 'pvnet'
 gpus: (0, 1, 2, 3)
-resume: true        # if we want to continue training from last saved model
+resume: false        # if we want to continue training from last saved model
 
 train:
     optim: 'adam'

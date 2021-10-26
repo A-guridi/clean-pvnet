@@ -57,9 +57,8 @@ def resize_all_images(data_root):
 
         width_ratio = width / img.shape[1]
         height_ratio = height / img.shape[0]
-        # if width_ratio == 1 and height_ratio == 1:
-        #     print("No resizing is needed")
-        #     return
+        if width_ratio == 1 and height_ratio == 1:
+            continue            # no need to resize for this image
         img = cv2.resize(img, (width, height), interpolation=cv2.INTER_AREA)
         cv2.imwrite(im_path, img)
 
@@ -69,8 +68,8 @@ def resize_all_images(data_root):
         mask = cv2.resize(mask, (width, height), interpolation=cv2.INTER_AREA)
         cv2.imwrite(mask_path, mask)
 
-    # thirdly, we reshape on a separate loop all the polarized images ( because their length is not the same as RGB
-    # or mask )
+    # thirdly, we reshape on a separate loop all the polarized images ( because we may have multiple polarized images
+    # for one single RGB image )
     for pol in all_polarization:
         pol_path = os.path.join(pol_images, pol)
         pol_img = cv2.imread(pol_path)
@@ -101,13 +100,13 @@ def create_polarized_pics(old_data_root, source_image_path):
     # Copies the specified polarized images into the training path
     # note, source_images should be the folder output from the rendering of mitsuba
     # in it, 200 folders, one for each pose, and inside the folder all the images
-    print("Copying all images to a new polarization folder")
+
     pol_path = os.path.join(old_data_root, "pol/")
 
-    source_images_type = ["stokes_s1.jpg", "stokes_s2.jpg"]
-    # source_images_type = ["stokes_dolp.jpg", "stokes_aolp.jpg"]
+    source_images_type = ["stokes_s1.jpg", "stokes_s2.jpg", "stokes_dolp.jpg", "stokes_aolp.jpg"]
+    print(f"Copying all images {source_images_type} to a new polarization folder")
     source_images = sorted(os.listdir(source_image_path))
-    source_images.remove("lava")        # this was a test folder not used anymore
+    source_images.remove("lava")  # this was a test folder not used anymore
     if not os.path.isdir(pol_path):
         os.mkdir(pol_path)
     elif os.path.isdir(pol_path) and len(os.listdir(pol_path)) > 0:
