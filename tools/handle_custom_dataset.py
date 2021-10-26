@@ -104,7 +104,8 @@ def create_polarized_pics(old_data_root, source_image_path):
     print("Copying all images to a new polarization folder")
     pol_path = os.path.join(old_data_root, "pol/")
 
-    source_images_type = ["stokes_dolp.jpg", "stokes_aolp.jpg"]
+    source_images_type = ["stokes_s1.jpg", "stokes_s2.jpg"]
+    # source_images_type = ["stokes_dolp.jpg", "stokes_aolp.jpg"]
     source_images = sorted(os.listdir(source_image_path))
     source_images.remove("lava")        # this was a test folder not used anymore
     if not os.path.isdir(pol_path):
