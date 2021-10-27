@@ -103,7 +103,8 @@ def b_inv(b_mat):
     '''
     eye = b_mat.new_ones(b_mat.size(-1)).diag().expand_as(b_mat)
     try:
-        b_inv, _ = torch.solve(eye, b_mat)
+        # b_inv, _ = torch.solve(eye, b_mat)        # deprecated
+        b_inv, _ = torch.linalg.solve(b_mat, eye)
     except:
         b_inv = eye
     return b_inv

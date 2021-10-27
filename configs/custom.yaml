@@ -5,7 +5,7 @@ network: 'res'
 heads: ''
 task: 'pvnet'
 gpus: (0, 1, 2, 3)
-resume: false        # if we want to continue training from last saved model
+resume: true        # if we want to continue training from last saved model
 
 train:
     optim: 'adam'
