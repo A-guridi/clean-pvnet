@@ -114,7 +114,7 @@ def run_tensor():
     data_loader = make_data_loader(cfg, is_train=False)
     image = data_loader[0]['inp']
 
-    writer = SummaryWriter('data/record/pvnet')
+    writer = SummaryWriter('data/record/pvnetgraph')
     writer.add_graph(network, image)
     writer.close()
 
