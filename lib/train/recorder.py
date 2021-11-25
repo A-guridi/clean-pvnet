@@ -66,7 +66,7 @@ class Recorder(object):
             if k != 'meta':  # Facebook, meta and cuda
                 batch[k] = batch[k].cuda()
         network.eval()
-        self.writer.add_graph(network, batch['inp'], use_strict_trace=False)
+        self.writer.add_graph(network, batch['inp'], strict=False )
 
     def update_image_stats(self, image_stats):
         if self.processor is None:
