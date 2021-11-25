@@ -61,7 +61,7 @@ class Recorder(object):
 
     def add_net(self, network, images_loader):
         dataiter = iter(images_loader)
-        im, lab = dataiter.__next__()
+        im = dataiter.__next__()
         self.writer.add_graph(network, im)
 
     def update_image_stats(self, image_stats):
