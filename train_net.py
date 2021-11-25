@@ -16,8 +16,6 @@ def train(cfg, network):
     scheduler = make_lr_scheduler(cfg, optimizer)
     recorder = make_recorder(cfg)
     evaluator = make_evaluator(cfg)
-    # add net to recorder
-    recorder.add_net(network)
 
     begin_epoch = load_model(network, optimizer, scheduler, recorder, cfg.model_dir, resume=cfg.resume)
     # set_lr_scheduler(cfg, scheduler)
@@ -25,6 +23,9 @@ def train(cfg, network):
     train_loader = make_data_loader(cfg, is_train=True, max_iter=cfg.ep_iter)
     val_loader = make_data_loader(cfg, is_train=False)
     # train_loader = make_data_loader(cfg, is_train=True, max_iter=100)
+
+    # add net to recorder
+    recorder.add_net(network, train_loader[0]['inp'])
     now = time.time()
 
     for epoch in range(begin_epoch, cfg.train.epoch):

@@ -59,8 +59,8 @@ class Recorder(object):
         for k, v in loss_dict.items():
             self.loss_stats[k].update(v.detach().cpu())
 
-    def add_net(self, network):
-        self.writer.add_graph(network)
+    def add_net(self, network, images=None):
+        self.writer.add_graph(network, images)
 
     def update_image_stats(self, image_stats):
         if self.processor is None:
