@@ -5,6 +5,7 @@ from lib.datasets import make_data_loader
 from lib.utils.net_utils import load_model, save_model, load_network
 from lib.evaluators import make_evaluator
 import torch.multiprocessing
+import time
 
 
 def train(cfg, network):
@@ -22,6 +23,7 @@ def train(cfg, network):
     train_loader = make_data_loader(cfg, is_train=True, max_iter=cfg.ep_iter)
     val_loader = make_data_loader(cfg, is_train=False)
     # train_loader = make_data_loader(cfg, is_train=True, max_iter=100)
+    now = time.time()
 
     for epoch in range(begin_epoch, cfg.train.epoch):
         recorder.epoch = epoch
@@ -34,6 +36,8 @@ def train(cfg, network):
         if (epoch + 1) % cfg.eval_ep == 0:
             trainer.val(epoch, val_loader, evaluator, recorder)
 
+    finaltime = time.time()
+    print("Elapsed training time", (finaltime - now) / 60.0)
     return network
 
 
