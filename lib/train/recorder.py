@@ -61,7 +61,10 @@ class Recorder(object):
 
     def add_net(self, network, images_loader):
         dataiter = iter(images_loader)
-        im = dataiter.next()['inp']
+        batch = dataiter.next()
+        for k in batch:
+            if k != 'meta':     # Facebook, meta and cuda
+                batch[k] = batch[k].cuda()
         network.eval()
         self.writer.add_graph(network, im)
 
