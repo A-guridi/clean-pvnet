@@ -50,8 +50,8 @@ class Recorder(object):
 
         # images
         self.image_stats = defaultdict(object)
-        if 'process_'+cfg.task in globals():
-            self.processor = globals()['process_'+cfg.task]
+        if 'process_' + cfg.task in globals():
+            self.processor = globals()['process_' + cfg.task]
         else:
             self.processor = None
 
@@ -59,8 +59,10 @@ class Recorder(object):
         for k, v in loss_dict.items():
             self.loss_stats[k].update(v.detach().cpu())
 
-    def add_net(self, network, images=None):
-        self.writer.add_graph(network, images)
+    def add_net(self, network, images_loader):
+        dataiter = iter(images_loader)
+        im, lab = dataiter.__next__()
+        self.writer.add_graph(network, im)
 
     def update_image_stats(self, image_stats):
         if self.processor is None:
@@ -106,4 +108,3 @@ class Recorder(object):
 
 def make_recorder(cfg):
     return Recorder(cfg)
-
