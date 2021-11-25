@@ -25,7 +25,7 @@ def train(cfg, network):
     # train_loader = make_data_loader(cfg, is_train=True, max_iter=100)
 
     # add net to recorder
-    recorder.add_net(network, val_loader)
+    # recorder.add_net(network, val_loader)     # not working atm
     now = time.time()
 
     for epoch in range(begin_epoch, cfg.train.epoch):
