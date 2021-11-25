@@ -80,6 +80,45 @@ def run_evaluate():
     evaluator.summarize()
 
 
+def run_onnx():
+    import torch
+    from lib.networks import make_network
+    from lib.utils.net_utils import load_network
+
+    torch.manual_seed(0)
+
+    network = make_network(cfg).cuda()
+    load_network(network, cfg.model_dir, resume=cfg.resume, epoch=cfg.test.epoch)
+    network.eval()
+
+    x = torch.randn(1, 1, 512, 512, requires_grad=True)
+    torch_out = network(x)
+    torch.onnx.export(network, x, "architecture_net.onnx", do_constant_folding=True, input_names=['input'],
+                      output_names=['output'],  # the model's output names
+                      dynamic_axes={'input': {0: 'batch_size'},  # variable length axes
+                                    'output': {0: 'batch_size'}})
+
+
+def run_tensor():
+    import torch
+    from torch.utils.tensorboard import SummaryWriter
+    from lib.networks import make_network
+    from lib.utils.net_utils import load_network
+    from lib.datasets import make_data_loader
+
+    # default `log_dir` is "runs" - we'll be more specific here
+    network = make_network(cfg).cuda()
+    load_network(network, cfg.model_dir, resume=cfg.resume, epoch=cfg.test.epoch)
+    network.eval()
+
+    data_loader = make_data_loader(cfg, is_train=False)
+    image = data_loader[0]['inp']
+
+    writer = SummaryWriter('data/record/pvnet')
+    writer.add_graph(network, image)
+    writer.close()
+
+
 def run_visualize():
     from lib.networks import make_network
     from lib.datasets import make_data_loader
@@ -244,6 +283,7 @@ def run_detector_pvnet():
             output = network(batch['inp'], batch)
         visualizer.visualize(output, batch)
 
+
 def run_demo():
     from lib.datasets import make_data_loader
     from lib.visualizers import make_visualizer
@@ -267,12 +307,12 @@ def run_demo():
     mean, std = np.array([0.485, 0.456, 0.406]), np.array([0.229, 0.224, 0.225])
     for demo_image in demo_images:
         demo_image = np.array(Image.open(demo_image)).astype(np.float32)
-        inp = (((demo_image/255.)-mean)/std).transpose(2, 0, 1).astype(np.float32)
+        inp = (((demo_image / 255.) - mean) / std).transpose(2, 0, 1).astype(np.float32)
         inp = torch.Tensor(inp[None]).cuda()
         with torch.no_grad():
             output = network(inp)
         visualizer.visualize_demo(output, inp, meta)
 
-if __name__ == '__main__':
-    globals()['run_'+args.type]()
 
+if __name__ == '__main__':
+    globals()['run_' + args.type]()
