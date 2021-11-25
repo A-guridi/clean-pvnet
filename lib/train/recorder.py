@@ -63,10 +63,10 @@ class Recorder(object):
         dataiter = iter(images_loader)
         batch = dataiter.next()
         for k in batch:
-            if k != 'meta':     # Facebook, meta and cuda
+            if k != 'meta':  # Facebook, meta and cuda
                 batch[k] = batch[k].cuda()
         network.eval()
-        self.writer.add_graph(network, batch['inp'])
+        self.writer.add_graph(network, batch['inp'], use_strict_trace=False)
 
     def update_image_stats(self, image_stats):
         if self.processor is None:
