@@ -39,21 +39,21 @@ class PoseParser:
         object_type = obj_dict["object_type"]
         object_name = obj_dict["object_name"]
 
-        class_id = "-1"
-        instance_id = "-1"
+        class_id = -1
+        instance_id = -1
         with open(os.path.abspath(json_file), 'r') as gtfile:
             ids = json.load(gtfile)
         for key in ids.keys():
             if ids[key]["class_name"] == object_type:
-                class_id = str(key)
+                class_id = int(key)
                 break
-        if class_id == "-1":
+        if class_id == -1:
             print(f"Object class {object_type} not found")
-        for key, value in ids[class_id]["objs"].items():
+        for key, value in ids[str(class_id)]["objs"].items():
             if value == object_name:
-                instance_id = str(key)
+                instance_id = int(key)
                 break
-        if instance_id == "-1":
+        if instance_id == -1:
             print(f"Object name {object_name} not found")
 
         return class_id, instance_id
@@ -93,7 +93,7 @@ class PoseParser:
         for i in range(len(self.gt_dict.keys())):
             gt_params = [gt_dict for gt_dict in self.gt_dict[str(i)] if
                          (gt_dict["class_id"] == self.class_id and gt_dict["inst_id"] == self.instance_id)]
-            assert len(gt_params) == 1, "Error, only one object with obj_id==1 should be found"
+            assert len(gt_params) == 1, f"Error, only one object with obj_id==1 should be found,  however gt_params={gt_params} "
             gt_params = gt_params[0]
             cam_R = np.array(gt_params["cam_R_m2c"]).reshape((3, 3))
             cam_T = np.array(gt_params["cam_t_m2c"]) / 1000.0
@@ -112,10 +112,8 @@ class PoseParser:
             shutil.rmtree(rgb_path)
         os.mkdir(rgb_path)
         all_folders = sorted(os.listdir(self.images_path))
-        try:
+        if "lava" in all_folders:
             all_folders.remove("lava")
-        except:
-            pass
         for fold in all_folders:
             shutil.copy2(self.images_path + fold + "/stokes_s0.jpg", rgb_path + str(fold) + ".jpg")
 
