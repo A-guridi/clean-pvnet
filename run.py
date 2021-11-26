@@ -256,7 +256,8 @@ def run_render():
 
 def run_custom(data_root='data/custom'):
     from tools import handle_custom_dataset
-    handle_custom_dataset.run_all_custom(data_root)  # added for resizing all images
+    old_root = "/home/arturo/renders/cup/mitsuba_cup/output/"
+    handle_custom_dataset.run_all_custom(data_root, old_root)  # added for resizing all images
     handle_custom_dataset.sample_fps_points(data_root)
     handle_custom_dataset.custom_to_coco(data_root)
 
@@ -264,6 +265,21 @@ def run_custom(data_root='data/custom'):
 def run_custom_test():
     from tools import handle_custom_dataset
     data_root = 'data/custom_test'
+    handle_custom_dataset.rename_pics(data_root)
+    run_custom(data_root)
+
+
+def run_custom_glass():
+    from tools import handle_custom_dataset
+    data_root = 'data/custom_glass'
+    old_root = "/home/arturo/renders/glass/mitsuba_glass/output/"
+    handle_custom_dataset.run_all_custom(data_root, old_root)  # added for resizing all images
+    handle_custom_dataset.sample_fps_points(data_root)
+    handle_custom_dataset.custom_to_coco(data_root)
+
+def run_custom_test_glass():
+    from tools import handle_custom_dataset
+    data_root = 'data/custom_test_glass'
     handle_custom_dataset.rename_pics(data_root)
     run_custom(data_root)
 

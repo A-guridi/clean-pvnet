@@ -28,8 +28,8 @@ class MaskExtract:
 
 
 if __name__ == "__main__":
-    mask_dir = "/home/arturo/datasets/test_dataset_arturo/sequence_15/mask/"
-    outdir = "/home/arturo/datasets/testset/"
+    mask_dir = "/home/arturo/datasets/sequence_12/mask/"
+    outdir = "/home/arturo/datasets/testset_glass/"
     position = 4
     mex = MaskExtract(mask_dir, outdir, position)
     mex.save_all()

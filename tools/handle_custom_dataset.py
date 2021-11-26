@@ -26,9 +26,9 @@ def transform_obj_to_ply(model_path):
     print("PLY file successfully created")
 
 
-def run_all_custom(data_root, new_size=(512, 512)):
+def run_all_custom(data_root, old_data_root, new_size=(512, 512)):
     # function to run all added custom functions to prepare the data before training
-    create_polarized_pics(data_root, "/home/arturo/renders/cup/mitsuba_cup/output/")
+    create_polarized_pics(data_root, old_data_root)
     resize_all_images(data_root, new_size)
 
 
@@ -110,7 +110,8 @@ def create_polarized_pics(old_data_root, source_image_path):
     source_images_type = ["stokes_s1.jpg", "stokes_s2.jpg", "stokes_dolp.jpg", "stokes_aolp.jpg"]
     print(f"Copying all images {source_images_type} to a new polarization folder")
     source_images = sorted(os.listdir(source_image_path))
-    source_images.remove("lava")  # this was a test folder not used anymore
+    if "lava" in source_images:
+        source_images.remove("lava")  # this was a test folder not used anymore
     if not os.path.isdir(pol_path):
         os.mkdir(pol_path)
     elif os.path.isdir(pol_path) and len(os.listdir(pol_path)) > 0:

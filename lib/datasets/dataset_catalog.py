@@ -72,10 +72,10 @@ class DatasetCatalog(object):
             'ann_file': 'data/YCB/posedb/{}_val.pkl'.format(cfg.cls_type),
             'data_root': 'data/YCB'
         },
-	'CustomTrain': {
+        'CustomTrain': {
             'id': 'custom',
             'data_root': 'data/custom',
-            'ann_file': 'data/custom/train.json',
+            'ann_file': 'data/custom_glass/train.json',
             'split': 'train'
         },
         # change to custom_test to evaluate on the test folder, change to custom for the training folder
@@ -83,6 +83,19 @@ class DatasetCatalog(object):
             'id': 'custom',
             'data_root': 'data/custom_test',
             'ann_file': 'data/custom_test/train.json',
+            'split': 'test'
+        },
+        'CustomGlass': {
+            'id': 'custom',
+            'data_root': 'data/custom_glass',
+            'ann_file': 'data/custom_glass/train.json',
+            'split': 'train'
+        },
+        # change to custom_test to evaluate on the test folder, change to custom for the training folder
+        'CustomTestGlass': {
+            'id': 'custom',
+            'data_root': 'data/custom_test_glass',
+            'ann_file': 'data/custom_test_glass/train.json',
             'split': 'test'
         }
     }

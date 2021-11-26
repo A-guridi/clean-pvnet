@@ -142,18 +142,18 @@ class PoseParser:
 
 
 if __name__ == "__main__":
-    files_path = "/home/arturo/datasets/testset/"
+    files_path = "/home/arturo/datasets/testset_glass/"
     camera_json = "/home/arturo/datasets/test_dataset_arturo/scene_camera.json"
-    ground_truth_json = "/home/arturo/datasets/test_dataset_arturo/sequence_15/scene_gt.json"
+    ground_truth_json = "/home/arturo/datasets/sequence_12/scene_gt.json"
     images_path = "/home/arturo/renders/glass/mitsuba_glass/output/"
     object_get = {"classes_object": "/home/arturo/datasets/test_dataset_arturo/class_obj_taxonomy.json",
-                  "object_name": "cup_green_actys",
-                  "object_type": "cup"
+                  "object_name": "glass_beer_mug",
+                  "object_type": "glass"
                   }
     diameter = 0.163514
     new_diameter_glass = [0.131568, 0.086612, 0.16365]  # 3D sizes of the bbox are also supported
     simple_parser = PoseParser(camera_json=camera_json, gt_json=ground_truth_json, images_path=images_path,
-                               diameter=diameter, output_path=files_path, obj_dict=object_get)
+                               diameter=new_diameter_glass, output_path=files_path, obj_dict=object_get)
     try:
         arg = sys.argv[1]
     except:
