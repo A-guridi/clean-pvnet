@@ -1,5 +1,5 @@
 """
-Added file for pre-processing the testing dataset
+Added file for pre-processing the testing dataset for testing
 """
 import os
 import shutil
@@ -18,7 +18,9 @@ class PoseParser:
         self.gt_file_path = gt_json
         with open(os.path.abspath(gt_json), 'r') as gtfile:
             gt = json.load(gtfile)
-        self.gt_dict = self.get_instance(obj_dict)
+        self.gt_dict = gt
+        self.class_id, self.instance_id = self.get_instance(obj_dict)
+        print(f"Getting object with class id {self.class_id} and instance id {self.instance_id}")
         if type(diameter) == list:
             if len(diameter) == 3:
                 self.diameter = self.calculate_diameter(diameter)
@@ -85,11 +87,12 @@ class PoseParser:
         if os.path.exists(out_path):
             shutil.rmtree(out_path)
         os.mkdir(out_path)
-        # ex_file = np.load("/home/arturo/datasets/custom_download/pose/" + example_file)
+        ex_file = None
         # print(ex_file)
         # print(ex_file.shape)
         for i in range(len(self.gt_dict.keys())):
-            gt_params = [gt_dict for gt_dict in self.gt_dict[str(i)] if gt_dict["obj_id"] == 1]
+            gt_params = [gt_dict for gt_dict in self.gt_dict[str(i)] if
+                         (gt_dict["class_id"] == self.class_id and gt_dict["inst_id"] == self.instance_id)]
             assert len(gt_params) == 1, "Error, only one object with obj_id==1 should be found"
             gt_params = gt_params[0]
             cam_R = np.array(gt_params["cam_R_m2c"]).reshape((3, 3))
@@ -98,7 +101,9 @@ class PoseParser:
             rot_mat[:3, :3] = cam_R
             rot_mat[:3, 3] = cam_T.flatten()
             np.save(out_path + f"pose{i}.npy", rot_mat)
+            ex_file = rot_mat
 
+        print("Example file", ex_file)
         print("All poses successfully created")
 
     def create_test_images(self):
