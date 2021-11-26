@@ -80,8 +80,8 @@ class DatasetCatalog(object):
         },
         'CustomTest': {
             'id': 'custom',
-            'data_root': 'data/custom',
-            'ann_file': 'data/custom/train.json',
+            'data_root': 'data/custom_test',
+            'ann_file': 'data/custom_test/train.json',
             'split': 'test'
         }
     }
