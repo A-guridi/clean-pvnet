@@ -96,14 +96,14 @@ class PoseParser:
             assert len(gt_params) == 1, f"Error, only one object with obj_id==1 should be found,  however gt_params={gt_params} "
             gt_params = gt_params[0]
             cam_R = np.array(gt_params["cam_R_m2c"]).reshape((3, 3))
-            cam_T = np.array(gt_params["cam_t_m2c"]) / 1000.0
+            # cam_T = np.array(gt_params["cam_t_m2c"]) / 1000.0
+            cam_T = np.array(gt_params["cam_t_m2c"])
             rot_mat = np.zeros(shape=(3, 4))
             rot_mat[:3, :3] = cam_R
             rot_mat[:3, 3] = cam_T.flatten()
             np.save(out_path + f"pose{i}.npy", rot_mat)
             ex_file = rot_mat
 
-        print("Example file", ex_file)
         print("All poses successfully created")
 
     def create_test_images(self):

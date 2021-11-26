@@ -8,7 +8,6 @@ from lib.utils import img_utils
 import matplotlib.patches as patches
 from lib.utils.pvnet import pvnet_pose_utils
 
-
 mean = pvnet_config.mean
 std = pvnet_config.std
 
@@ -40,8 +39,12 @@ class Visualizer:
         ax.imshow(inp)
         ax.add_patch(patches.Polygon(xy=corner_2d_gt[[0, 1, 3, 2, 0, 4, 6, 2]], fill=False, linewidth=1, edgecolor='g'))
         ax.add_patch(patches.Polygon(xy=corner_2d_gt[[5, 4, 6, 7, 5, 1, 3, 7]], fill=False, linewidth=1, edgecolor='g'))
-        ax.add_patch(patches.Polygon(xy=corner_2d_pred[[0, 1, 3, 2, 0, 4, 6, 2]], fill=False, linewidth=1, edgecolor='b'))
-        ax.add_patch(patches.Polygon(xy=corner_2d_pred[[5, 4, 6, 7, 5, 1, 3, 7]], fill=False, linewidth=1, edgecolor='b'))
+        ax.add_patch(
+            patches.Polygon(xy=corner_2d_pred[[0, 1, 3, 2, 0, 4, 6, 2]], fill=False, linewidth=1, edgecolor='b'))
+        ax.add_patch(
+            patches.Polygon(xy=corner_2d_pred[[5, 4, 6, 7, 5, 1, 3, 7]], fill=False, linewidth=1, edgecolor='b'))
+
+        plt.scatter(x=kpt_2d[:, 0], y=kpt_2d[:, 1], c='r')
         plt.show()
 
     def visualize_train(self, output, batch):
@@ -61,8 +64,3 @@ class Visualizer:
         plt.imshow(vertex)
         plt.savefig('test.jpg')
         plt.close(0)
-
-
-
-
-

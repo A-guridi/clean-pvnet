@@ -254,12 +254,18 @@ def run_render():
     plt.show()
 
 
-def run_custom():
+def run_custom(data_root='data/custom'):
     from tools import handle_custom_dataset
-    data_root = 'data/custom'
     handle_custom_dataset.run_all_custom(data_root)  # added for resizing all images
     handle_custom_dataset.sample_fps_points(data_root)
     handle_custom_dataset.custom_to_coco(data_root)
+
+
+def run_custom_test():
+    from tools import handle_custom_dataset
+    data_root = 'data/custom_test'
+    handle_custom_dataset.rename_pics(data_root)
+    run_custom(data_root)
 
 
 def run_detector_pvnet():

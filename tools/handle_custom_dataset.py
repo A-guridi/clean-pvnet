@@ -26,13 +26,13 @@ def transform_obj_to_ply(model_path):
     print("PLY file successfully created")
 
 
-def run_all_custom(data_root):
+def run_all_custom(data_root, new_size=(512, 512)):
     # function to run all added custom functions to prepare the data before training
     create_polarized_pics(data_root, "/home/arturo/renders/cup/mitsuba_cup/output/")
-    resize_all_images(data_root)
+    resize_all_images(data_root, new_size)
 
 
-def resize_all_images(data_root):
+def resize_all_images(data_root, new_size=None):
     rgb_images = os.path.join(data_root, "rgb/")
     masks = os.path.join(data_root, "mask/")
     pol_images = os.path.join(data_root, "pol/")
@@ -42,23 +42,27 @@ def resize_all_images(data_root):
     all_polarization = sorted(os.listdir(pol_images))
     assert len(all_images) == len(all_masks), "Error, the len of all the images should be the same as the masks"
     print("Resizing all images, masks and camera")
-    width = 0
-    height = 0
+    if new_size is not None:
+        width, height = new_size
+    else:
+        width = 0
+        height = 0
     width_ratio = 0.0
     height_ratio = 0.0
     for image, mask in tqdm.tqdm(zip(all_images, all_masks)):
         # first we resize all the RGB images
         im_path = os.path.join(rgb_images, image)
         img = cv2.imread(im_path)
-        width = int(img.shape[1] - img.shape[1] % 32)
-        height = int(img.shape[0] - img.shape[0] % 32)
-        width = min(width, height)
-        height = min(width, height)
+        if new_size is None:
+            width = int(img.shape[1] - img.shape[1] % 32)
+            height = int(img.shape[0] - img.shape[0] % 32)
+            width = min(width, height)
+            height = min(width, height)
 
         width_ratio = width / img.shape[1]
         height_ratio = height / img.shape[0]
         if width_ratio == 1 and height_ratio == 1:
-            continue            # no need to resize for this image
+            continue  # no need to resize for this image
         img = cv2.resize(img, (width, height), interpolation=cv2.INTER_AREA)
         cv2.imwrite(im_path, img)
 
@@ -230,3 +234,17 @@ def custom_to_coco(data_root):
     anno_path = os.path.join(data_root, 'train.json')
     with open(anno_path, 'w') as f:
         json.dump(instance, f)
+
+
+def rename_pics(data_root):
+    print("Renaming pictures")
+    rgb_pics = os.path.join(data_root, "rgb")
+    all_pics = sorted(os.listdir(rgb_pics))
+    for pic in tqdm.tqdm(all_pics):
+        if "jpg" in pic:
+            continue
+        im = cv2.imread(os.path.join(rgb_pics, pic))
+        new_name = pic[:-4]
+        new_name = str(int(new_name)) + ".jpg"
+        cv2.imwrite(os.path.join(rgb_pics, new_name), im)
+        os.remove(os.path.join(rgb_pics, pic))

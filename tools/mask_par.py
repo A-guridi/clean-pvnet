@@ -17,7 +17,9 @@ class MaskExtract:
         mask = cv2.imread(os.path.join(self.mask_dir, self.all_mask[idx]), cv2.IMREAD_GRAYSCALE)
         mask = np.array(mask)
         mask = np.where(mask == self.position, 255, 0)
-        cv2.imwrite(os.path.join(self.output_dir, self.all_mask[idx]), mask)
+        name = self.all_mask[idx][:-4]
+        name = str(int(name)) + ".png"
+        cv2.imwrite(os.path.join(self.output_dir, name), mask)
 
     def save_all(self):
         print("Saving all mask")
