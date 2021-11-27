@@ -1,6 +1,6 @@
 # wait
 model: 'custom'
-model_dir: 'data/model_lf_s1_s2'
+model_dir: 'data/model_lf_s1s2_polinference_cup'
 network: 'res'
 heads: ''
 task: 'pvnet'
@@ -21,7 +21,7 @@ train:
     rotate_max: 30
     weight_decay: 0.
     batch_sampler: 'image_size'
-    stokes_params: ["_aolp.jpg", "_dolp.jpg"]
+    stokes_params: ["_dolp.jpg", "_aolp.jpg"]
 test:
     dataset: 'CustomTrain'
     batch_size: 1
