@@ -150,7 +150,7 @@ class Resnet18(nn.Module):
         if True:
             seg_pred_pol = out_pol[:, :self.seg_dim, :, :]
             ver_pred_pol = out_pol[:, self.seg_dim:, :, :]
-            ret.update({'seg_pol': seg_pred_pol, 'vertex_pol': ver_pred_pol})
+            ret.update({'seg': seg_pred_pol, 'vertex': ver_pred_pol})
 
         if not self.training:
             with torch.no_grad():  # this is because the PnP algorithm is not differentiable -> no gradient
