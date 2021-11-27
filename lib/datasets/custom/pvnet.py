@@ -52,9 +52,9 @@ class Dataset(data.Dataset):
         cls_idx = linemod_config.linemod_cls_names.index(anno['cls']) + 1
         mask = pvnet_data_utils.read_linemod_mask(anno['mask_path'], anno['type'], cls_idx)
 
-        if self.split == "train":
-            pol_images = self.read_pol_image(img_id, inp.width, inp.height)
-            inp = np.concatenate((inp, pol_images), axis=2)
+        # if self.split == "train":
+        pol_images = self.read_pol_image(img_id, inp.width, inp.height)
+        inp = np.concatenate((inp, pol_images), axis=2)
 
         return inp, kpt_2d, mask
 

@@ -108,7 +108,8 @@ class Resnet18(nn.Module):
         # x_rgb is just the normal RGB encoder while xfc is the combination of both feature maps
         x2s, x4s, x8s, x16s, x32s, x_rgb, xfc, x2s_pol, x4s_pol, x8s_pol, x16s_pol, x32s_pol = self.resnet18_8s(x)
 
-        if self.training:
+        # set to true for the inference model
+        if True:
             # on training, xfc is the combination of both feature maps from RGB and polarization
             fm = self.conv8s_pol(torch.cat([xfc, x8s, x8s_pol], 1))
             fm = self.up8sto4s(fm)
@@ -119,13 +120,15 @@ class Resnet18(nn.Module):
             fm = self.up4sto2s(fm)
             fm = self.conv2s_pol(torch.cat([fm, x2s, x2s_pol], 1))
             fm = self.up2storaw(fm)
-            out_pol = self.convraw_pol(torch.cat([fm, x], 1))  # this layer was changed depending on the channels of input
+            out_pol = self.convraw_pol(
+                torch.cat([fm, x], 1))  # this layer was changed depending on the channels of input
 
             xfc = x_rgb
             x, _ = torch.split(x, [3, 2], dim=1)
             # when training, we change the value of xfc once used so the RGB decoder (conv8s) gets only
             # the RGB input. On testing, xfc will automatically be the output of the RGB encoder only
-
+        """
+        Left out code for the inference model
         fm_rgb = self.conv8s(torch.cat([xfc, x8s], 1))
         fm_rgb = self.up8sto4s(fm_rgb)
         if fm_rgb.shape[2] == 136:
@@ -142,14 +145,15 @@ class Resnet18(nn.Module):
         ver_pred_rgb = out_rgb[:, self.seg_dim:, :, :]
 
         ret = {'seg': seg_pred_rgb, 'vertex': ver_pred_rgb}
-
-        if self.training:
+        """
+        ret = {}
+        if True:
             seg_pred_pol = out_pol[:, :self.seg_dim, :, :]
             ver_pred_pol = out_pol[:, self.seg_dim:, :, :]
             ret.update({'seg_pol': seg_pred_pol, 'vertex_pol': ver_pred_pol})
 
         if not self.training:
-            with torch.no_grad():       # this is because the PnP algorithm is not differentiable -> no gradient
+            with torch.no_grad():  # this is because the PnP algorithm is not differentiable -> no gradient
                 self.decode_keypoint(ret)
 
         return ret
