@@ -42,8 +42,8 @@ class NetworkWrapper(nn.Module):
             loss += vote_loss_pol
 
         # for the RBG
-        """
         mask = batch['mask'].long()
+        """
         seg_loss = self.seg_crit(output['seg'], mask)
         scalar_stats.update({'seg_loss': seg_loss})
         loss += seg_loss
