@@ -116,7 +116,8 @@ def make_transforms(cfg, is_train):
         transform = Compose(
             [
                 ToTensor(),
-                NormalizeTest(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225], to_bgr=True),
+                # change to NormalizeTest for RGB only inference
+                NormalizeTraining(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225], to_bgr=True),
             ]
         )
 
