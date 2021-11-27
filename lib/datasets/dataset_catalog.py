@@ -75,7 +75,7 @@ class DatasetCatalog(object):
         'CustomTrain': {
             'id': 'custom',
             'data_root': 'data/custom',
-            'ann_file': 'data/custom_glass/train.json',
+            'ann_file': 'data/custom/train.json',
             'split': 'train'
         },
         # change to custom_test to evaluate on the test folder, change to custom for the training folder
