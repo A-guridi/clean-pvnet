@@ -1,6 +1,6 @@
 # wait
 model: 'custom'
-model_dir: 'data/model_lf_s1s2_polinference_cup'
+model_dir: 'data/model_real_s1s2_polinference_glass'
 network: 'res'
 heads: ''
 task: 'pvnet'
@@ -14,15 +14,15 @@ train:
     milestones: (20, 40, 60, 80, 100, 120, 160, 180, 200, 220)
     gamma: 0.5
     batch_size: 4
-    dataset: 'CustomTrain'
+    dataset: 'CustomGlass'
     cropresize_rate: 1.0
     rotate_rate: 1.0
     rotate_min: -30
     rotate_max: 30
     weight_decay: 0.
     batch_sampler: 'image_size'
-    stokes_params: ["_dolp.jpg", "_aolp.jpg"]
+    stokes_params: ["_s1.jpg", "_s2.jpg"]
 test:
-    dataset: 'CustomTrain'
+    dataset: 'CustomGlass'
     batch_size: 1
     batch_sampler: 'image_size'
