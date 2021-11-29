@@ -40,7 +40,8 @@ def resize_all_images(data_root, new_size=None):
     all_images = sorted(os.listdir(rgb_images))
     all_masks = sorted(os.listdir(masks))
     all_polarization = sorted(os.listdir(pol_images))
-    assert len(all_images) == len(all_masks), "Error, the len of all the images should be the same as the masks"
+    assert len(all_images) == len(all_masks), f"Error, the len of all the images should be the same as the masks," \
+                                              f"but got {len(all_images)} and {len(all_masks)}"
     print("Resizing all images, masks and camera")
     if new_size is not None:
         width, height = new_size
