@@ -168,7 +168,7 @@ def crop_or_padding_to_fixed_size_instance(img, mask, hcoords, th, tw, overlap_r
 
 
 def crop_or_padding_to_fixed_size(img, mask, th, tw):
-    h, w, _ = img.shape
+    h, w, ch = img.shape
     hpad, wpad = th >= h, tw >= w
 
     hbeg = 0 if hpad else np.random.randint(0, h - th)
@@ -181,8 +181,8 @@ def crop_or_padding_to_fixed_size(img, mask, th, tw):
     mask = mask[hbeg:hend, wbeg:wend]
 
     if hpad or wpad:
-        nh, nw, _ = img.shape
-        new_img = np.zeros([th, tw, 3], dtype=img.dtype)
+        nh, nw, nch = img.shape
+        new_img = np.zeros([th, tw, ch], dtype=img.dtype)
         new_mask = np.zeros([th, tw], dtype=mask.dtype)
 
         hbeg = 0 if not hpad else (th - h) // 2
