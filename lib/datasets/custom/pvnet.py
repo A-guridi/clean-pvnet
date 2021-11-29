@@ -28,7 +28,7 @@ class Dataset(data.Dataset):
             stokes_types = self.cfg.train.stokes_params
         self.stokes_types = stokes_types
         self.num_stokes = len(stokes_types)
-        self.pol_inference = cfg.pol_inference
+        self.pol_inference = cfg.train.pol_inference
         print("Late fusion with stokes parameters:", self.stokes_types)
 
     def read_pol_image(self, im_id, im_width, im_height):

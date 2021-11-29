@@ -111,7 +111,7 @@ def make_transforms(cfg, is_train):
             ]
         )
     else:
-        if cfg.pol_inference:
+        if cfg.train.pol_inference:
             transform = Compose(
                 [
                     ToTensor(),

@@ -111,7 +111,7 @@ class Resnet18(nn.Module):
         ret = {}
 
         # used during training for RGB inference or always (train+inference) for polarized models
-        if self.training or cfg.pol_inference:
+        if self.training or cfg.train.pol_inference:
             # on training, xfc is the combination of both feature maps from RGB and polarization
             fm = self.conv8s_pol(torch.cat([xfc, x8s, x8s_pol], 1))
             fm = self.up8sto4s(fm)
@@ -131,7 +131,7 @@ class Resnet18(nn.Module):
             # the RGB input. On testing, xfc will automatically be the output of the RGB encoder only
 
         # only used for non polarized models RGB only inference, used both during training and inference
-        if not cfg.pol_inference:
+        if not cfg.train.pol_inference:
             fm_rgb = self.conv8s(torch.cat([xfc, x8s], 1))
             fm_rgb = self.up8sto4s(fm_rgb)
             if fm_rgb.shape[2] == 136:
@@ -156,7 +156,7 @@ class Resnet18(nn.Module):
             ret.update({'seg': seg_pred_pol, 'vertex': ver_pred_pol})
 
         # if training the RGB inference model, we add the results to the output
-        if self.training and not cfg.pol_inference:
+        if self.training and not cfg.train.pol_inference:
             seg_pred_pol = out_pol[:, :self.seg_dim, :, :]
             ver_pred_pol = out_pol[:, self.seg_dim:, :, :]
             ret.update({'seg_pol': seg_pred_pol, 'vertex_pol': ver_pred_pol})

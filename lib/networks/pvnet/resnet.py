@@ -244,7 +244,7 @@ class ResNet(nn.Module):
         return nn.Sequential(*layers)
 
     def forward(self, x):
-        if self.training or cfg.pol_inference:
+        if self.training or cfg.train.pol_inference:
             x_rgb, x_pol = torch.split(x, [3, 2], dim=1)
         else:
             x_rgb = x
@@ -261,7 +261,7 @@ class ResNet(nn.Module):
         x_rgb = x32s
 
         # for the polarized part
-        if self.training or cfg.pol_inference:
+        if self.training or cfg.train.pol_inference:
             x_pol = self.conv_input2(x_pol)
             x_pol = self.bn2(x_pol)
             x2s_pol = self.relu2(x_pol)             # shape 64
