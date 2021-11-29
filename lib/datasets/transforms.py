@@ -70,9 +70,7 @@ class NormalizeTest(object):
         return img, kpts, mask
 
 
-# suppressed because we want to keep the original colors of the input stokes parameters
 class ColorJitter(object):
-
     def __init__(self,
                  brightness=None,
                  contrast=None,
@@ -86,7 +84,7 @@ class ColorJitter(object):
             hue=hue, )
 
     def __call__(self, image, kpts, mask):
-        image = np.asarray(self.color_jitter(Image.fromarray(np.ascontiguousarray(image, np.uint8))))
+        image[:, :, :3] = np.asarray(self.color_jitter(Image.fromarray(np.ascontiguousarray(image[:, :, :3], np.uint8))))
         return image, kpts, mask
 
 
@@ -107,7 +105,7 @@ def make_transforms(cfg, is_train):
         transform = Compose(
             [
                 RandomBlur(0.5),
-                # ColorJitter(0.1, 0.1, 0.05, 0.05),
+                ColorJitter(0.1, 0.1, 0.05, 0.05),
                 ToTensor(),
                 NormalizeTraining(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225], to_bgr=True),
             ]
