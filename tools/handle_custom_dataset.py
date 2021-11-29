@@ -32,6 +32,20 @@ def run_all_custom(data_root, old_data_root, new_size=(512, 512)):
     resize_all_images(data_root, new_size)
 
 
+def rename_val(val_root, base_numb=520):
+
+    rgb_out = os.path.join(val_root, "rgb/")
+    pose_out = os.path.join(val_root, "pose/")
+    mask_out = os.path.join(val_root, "mask/")
+    pol_out = os.path.join(val_root, "pol/")
+
+    for i in range(len(os.listdir(rgb_out))):
+        os.rename(rgb_out+str(base_numb+i)+".jpg", rgb_out+str(i)+".jpg" )
+        os.rename(pose_out+"pose"+str(base_numb+i)+".npy", pose_out+"pose"+str(i)+".npy")
+        os.rename(mask_out + str(base_numb + i) + ".png", mask_out + str(i) + ".png")
+        for pol in ["_dolp", "_aolp", "_s1", "_s2"]:
+            os.rename(pol_out + str(base_numb+i) + pol + ".jpg", pol_out + str(i) + pol + ".jpg")
+
 def create_custom_val(train_root, val_root, val_size=80, max_val=600):
     if os.path.isdir(val_root):
         shutil.rmtree(val_root)
