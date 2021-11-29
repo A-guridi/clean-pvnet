@@ -43,11 +43,11 @@ def create_custom_val(train_root, val_root, val_size=80, max_val=600):
     pol_root = os.path.join(train_root, "pol")
     pol_out = os.path.join(val_root, "pol")
     for i in rand_vals:
-        shutil.move(rgb_root+str(i)+".jpg", rgb_out+str(i)+".jpg")
-        shutil.move(pose_root + str(i) + ".npy", pose_out + str(i) + ".npy")
-        shutil.move(mask_root + str(i) + ".png", mask_out + str(i) + ".png")
+        shutil.copy2(rgb_root+str(i)+".jpg", rgb_out+str(i)+".jpg")
+        shutil.copy2(pose_root + str(i) + ".npy", pose_out + str(i) + ".npy")
+        shutil.copy2(mask_root + str(i) + ".png", mask_out + str(i) + ".png")
         for pol in ["_dolp", "_aolp", "_s1", "_s2"]:
-            shutil.move(pol_root + str(i) + pol + ".jpg", pol_out + str(i) + pol + ".jpg")
+            shutil.copy2(pol_root + str(i) + pol + ".jpg", pol_out + str(i) + pol + ".jpg")
 
     shutil.copy2(train_root+"model.obj", val_root+"model.obj")
 
