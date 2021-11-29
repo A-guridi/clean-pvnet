@@ -32,6 +32,26 @@ def run_all_custom(data_root, old_data_root, new_size=(512, 512)):
     resize_all_images(data_root, new_size)
 
 
+def create_custom_val(train_root, val_root, val_size=80, max_val=600):
+    rand_vals = np.random.randint(0, max_val, val_size).tolist()
+    rgb_root = os.path.join(train_root, "rgb")
+    rgb_out = os.path.join(val_root, "rgb")
+    pose_root = os.path.join(train_root, "pose")
+    pose_out = os.path.join(val_root, "pose")
+    mask_root = os.path.join(train_root, "mask")
+    mask_out = os.path.join(val_root, "mask")
+    pol_root = os.path.join(train_root, "pol")
+    pol_out = os.path.join(val_root, "pol")
+    for i in rand_vals:
+        shutil.move(rgb_root+str(i)+".jpg", rgb_out+str(i)+".jpg")
+        shutil.move(pose_root + str(i) + ".npy", pose_out + str(i) + ".npy")
+        shutil.move(mask_root + str(i) + ".png", mask_out + str(i) + ".png")
+        for pol in ["_dolp", "_aolp", "_s1", "_s2"]:
+            shutil.move(pol_root + str(i) + pol + ".jpg", pol_out + str(i) + pol + ".jpg")
+
+    shutil.copy2(train_root+"model.obj", val_root+"model.obj")
+
+
 def resize_all_images(data_root, new_size=None):
     rgb_images = os.path.join(data_root, "rgb/")
     masks = os.path.join(data_root, "mask/")

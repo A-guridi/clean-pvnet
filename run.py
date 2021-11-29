@@ -285,9 +285,15 @@ def run_custom_test_glass():
 
 
 def run_custom_complex():
+    from tools import handle_custom_dataset
     data_root = 'data/custom_cscene'
     old_root = "/home/arturo/renders/complexscene/mistuba_cscene/output/"
+    new_val = 'data/custom_cscene_val'
+    handle_custom_dataset.create_custom_val(data_root, new_val)
     run_custom(data_root, old_root)
+
+    handle_custom_dataset.sample_fps_points(new_val)
+    handle_custom_dataset.custom_to_coco(new_val)
 
 
 def run_detector_pvnet():
