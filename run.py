@@ -289,7 +289,7 @@ def run_custom_complex():
     data_root = 'data/custom_cscene'
     old_root = "/home/arturo/renders/complexscene/mistuba_cscene/output/"
     new_val = '/home/arturo/datasets/custom_cscene_val'
-    handle_custom_dataset.create_custom_val(data_root, new_val)
+    # handle_custom_dataset.create_custom_val(data_root, new_val)
     run_custom(data_root, old_root)
 
     handle_custom_dataset.sample_fps_points(new_val)
