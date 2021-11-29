@@ -110,8 +110,8 @@ def resize_all_images(data_root, new_size=None):
 
         width_ratio = width / img.shape[1]
         height_ratio = height / img.shape[0]
-        if width_ratio == 1 and height_ratio == 1:
-            continue  # no need to resize for this image
+        #if width_ratio == 1 and height_ratio == 1:
+        #    continue  # no need to resize for this image
         img = cv2.resize(img, (width, height), interpolation=cv2.INTER_AREA)
         cv2.imwrite(im_path, img)
 
