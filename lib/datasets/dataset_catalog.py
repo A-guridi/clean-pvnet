@@ -97,7 +97,15 @@ class DatasetCatalog(object):
             'data_root': 'data/custom_test_glass',
             'ann_file': 'data/custom_test_glass/train.json',
             'split': 'test'
+        },
+        'CustomComplex': {
+            'id': 'custom',
+            'data_root': 'data/custom_cscene',
+            'ann_file': 'data/custom_cscene/train.json',
+            'split': 'train'
         }
+        # change to custom_test to evaluate on the test folder, change to custom for the training folder
+
     }
 
     @staticmethod
