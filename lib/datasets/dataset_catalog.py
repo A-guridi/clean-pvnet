@@ -108,7 +108,7 @@ class DatasetCatalog(object):
             'id': 'custom',
             'data_root': 'data/custom_cscene_val',
             'ann_file': 'data/custom_cscene_val/train.json',
-            'split': 'train'
+            'split': 'test'
         }
         # change to custom_test to evaluate on the test folder, change to custom for the training folder
 
