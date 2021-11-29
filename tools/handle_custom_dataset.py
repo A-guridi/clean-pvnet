@@ -42,13 +42,13 @@ def create_custom_val(train_root, val_root, val_size=80, max_val=600):
     mask_out = os.path.join(val_root, "mask/")
     pol_root = os.path.join(train_root, "pol/")
     pol_out = os.path.join(val_root, "pol/")
-    if not os.path.exist(rgb_out):
+    if not os.path.isdir(rgb_out):
         os.mkdir(rgb_out)
-    if not os.path.exist(pose_out):
+    if not os.path.isdir(pose_out):
         os.mkdir(pose_out)
-    if not os.path.exist(mask_out):
+    if not os.path.isdir(mask_out):
         os.mkdir(mask_out)
-    if not os.path.exist(pol_out):
+    if not os.path.isdir(pol_out):
         os.mkdir(pol_out)
 
     for i in rand_vals:
