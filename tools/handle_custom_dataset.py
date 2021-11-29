@@ -42,14 +42,23 @@ def create_custom_val(train_root, val_root, val_size=80, max_val=600):
     mask_out = os.path.join(val_root, "mask/")
     pol_root = os.path.join(train_root, "pol/")
     pol_out = os.path.join(val_root, "pol/")
+    if not os.path.exist(rgb_out):
+        os.mkdir(rgb_out)
+    if not os.path.exist(pose_out):
+        os.mkdir(pose_out)
+    if not os.path.exist(mask_out):
+        os.mkdir(mask_out)
+    if not os.path.exist(pol_out):
+        os.mkdir(pol_out)
+
     for i in rand_vals:
-        shutil.copy2(rgb_root+str(i)+".jpg", rgb_out+str(i)+".jpg")
-        shutil.copy2(pose_root + str(i) + ".npy", pose_out + str(i) + ".npy")
+        shutil.copy2(rgb_root + str(i) + ".jpg", rgb_out + str(i) + ".jpg")
+        shutil.copy2(pose_root + "pose" + str(i) + ".npy", pose_out + "pose" + str(i) + ".npy")
         shutil.copy2(mask_root + str(i) + ".png", mask_out + str(i) + ".png")
         for pol in ["_dolp", "_aolp", "_s1", "_s2"]:
             shutil.copy2(pol_root + str(i) + pol + ".jpg", pol_out + str(i) + pol + ".jpg")
 
-    shutil.copy2(train_root+"model.obj", val_root+"model.obj")
+    shutil.copy2(train_root + "model.obj", val_root + "model.obj")
 
 
 def resize_all_images(data_root, new_size=None):
