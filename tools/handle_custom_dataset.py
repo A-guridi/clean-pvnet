@@ -75,7 +75,7 @@ def resize_all_images(data_root, new_size=None):
 
     # thirdly, we reshape on a separate loop all the polarized images ( because we may have multiple polarized images
     # for one single RGB image )
-    for pol in all_polarization:
+    for pol in tqdm.tqdm(all_polarization):
         pol_path = os.path.join(pol_images, pol)
         pol_img = cv2.imread(pol_path)
         pol_img = cv2.resize(pol_img, (width, height), interpolation=cv2.INTER_AREA)
