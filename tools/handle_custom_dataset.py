@@ -34,14 +34,14 @@ def run_all_custom(data_root, old_data_root, new_size=(512, 512)):
 
 def create_custom_val(train_root, val_root, val_size=80, max_val=600):
     rand_vals = np.random.randint(0, max_val, val_size).tolist()
-    rgb_root = os.path.join(train_root, "rgb")
-    rgb_out = os.path.join(val_root, "rgb")
-    pose_root = os.path.join(train_root, "pose")
-    pose_out = os.path.join(val_root, "pose")
-    mask_root = os.path.join(train_root, "mask")
-    mask_out = os.path.join(val_root, "mask")
-    pol_root = os.path.join(train_root, "pol")
-    pol_out = os.path.join(val_root, "pol")
+    rgb_root = os.path.join(train_root, "rgb/")
+    rgb_out = os.path.join(val_root, "rgb/")
+    pose_root = os.path.join(train_root, "pose/")
+    pose_out = os.path.join(val_root, "pose/")
+    mask_root = os.path.join(train_root, "mask/")
+    mask_out = os.path.join(val_root, "mask/")
+    pol_root = os.path.join(train_root, "pol/")
+    pol_out = os.path.join(val_root, "pol/")
     for i in rand_vals:
         shutil.copy2(rgb_root+str(i)+".jpg", rgb_out+str(i)+".jpg")
         shutil.copy2(pose_root + str(i) + ".npy", pose_out + str(i) + ".npy")
