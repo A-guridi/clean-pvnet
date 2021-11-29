@@ -33,7 +33,7 @@ def run_all_custom(data_root, old_data_root, new_size=(512, 512)):
 
 
 def create_custom_val(train_root, val_root, val_size=80, max_val=600):
-    rand_vals = np.random.randint(0, max_val, val_size).tolist()
+    rand_vals = np.random.choice(max_val, val_size).tolist()
     rgb_root = os.path.join(train_root, "rgb/")
     rgb_out = os.path.join(val_root, "rgb/")
     pose_root = os.path.join(train_root, "pose/")
