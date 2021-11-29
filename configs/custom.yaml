@@ -1,6 +1,6 @@
 # wait
 model: 'custom'
-model_dir: 'data/model_real_s1s2_polinference_glass'
+model_dir: 'data/model_cup_cpx_adolp_RGB_inf'
 network: 'res'
 heads: ''
 task: 'pvnet'
