@@ -108,8 +108,10 @@ class Resnet18(nn.Module):
         # x_rgb is just the normal RGB encoder while xfc is the combination of both feature maps
         x2s, x4s, x8s, x16s, x32s, x_rgb, xfc, x2s_pol, x4s_pol, x8s_pol, x16s_pol, x32s_pol = self.resnet18_8s(x)
 
-        # set to true for the inference model
-        if True:
+        ret = {}
+
+        # used during training for RGB inference or always (train+inference) for polarized models
+        if self.training or cfg.pol_inference:
             # on training, xfc is the combination of both feature maps from RGB and polarization
             fm = self.conv8s_pol(torch.cat([xfc, x8s, x8s_pol], 1))
             fm = self.up8sto4s(fm)
@@ -127,30 +129,37 @@ class Resnet18(nn.Module):
             x, _ = torch.split(x, [3, 2], dim=1)
             # when training, we change the value of xfc once used so the RGB decoder (conv8s) gets only
             # the RGB input. On testing, xfc will automatically be the output of the RGB encoder only
-        """
-        Left out code for the inference model
-        fm_rgb = self.conv8s(torch.cat([xfc, x8s], 1))
-        fm_rgb = self.up8sto4s(fm_rgb)
-        if fm_rgb.shape[2] == 136:
-            fm_rgb = nn.functional.interpolate(fm_rgb, (135, 180), mode='bilinear', align_corners=False)
-        fm_rgb = self.conv4s(torch.cat([fm_rgb, x4s], 1))
-        fm_rgb = self.up4sto2s(fm_rgb)
-        fm_rgb = self.conv2s(torch.cat([fm_rgb, x2s], 1))
-        fm_rgb = self.up2storaw(fm_rgb)
-        out_rgb = self.convraw(torch.cat([fm_rgb, x], 1))
 
-        # we have now 2 outputs from 2 decoders, which will be fed to two different PnP algorithms and their
-        # Losses added
-        seg_pred_rgb = out_rgb[:, :self.seg_dim, :, :]
-        ver_pred_rgb = out_rgb[:, self.seg_dim:, :, :]
+        # only used for non polarized models RGB only inference, used both during training and inference
+        if not cfg.pol_inference:
+            fm_rgb = self.conv8s(torch.cat([xfc, x8s], 1))
+            fm_rgb = self.up8sto4s(fm_rgb)
+            if fm_rgb.shape[2] == 136:
+                fm_rgb = nn.functional.interpolate(fm_rgb, (135, 180), mode='bilinear', align_corners=False)
+            fm_rgb = self.conv4s(torch.cat([fm_rgb, x4s], 1))
+            fm_rgb = self.up4sto2s(fm_rgb)
+            fm_rgb = self.conv2s(torch.cat([fm_rgb, x2s], 1))
+            fm_rgb = self.up2storaw(fm_rgb)
+            out_rgb = self.convraw(torch.cat([fm_rgb, x], 1))
 
-        ret = {'seg': seg_pred_rgb, 'vertex': ver_pred_rgb}
-        """
-        ret = {}
-        if True:
+            # we have now 2 outputs from 2 decoders, which will be fed to two different PnP algorithms and their
+            # Losses added
+            seg_pred_rgb = out_rgb[:, :self.seg_dim, :, :]
+            ver_pred_rgb = out_rgb[:, self.seg_dim:, :, :]
+
+            ret.update({'seg': seg_pred_rgb, 'vertex': ver_pred_rgb})
+
+        # if training the polarized inference model, we use only the output from the combined pipeline
+        else:
             seg_pred_pol = out_pol[:, :self.seg_dim, :, :]
             ver_pred_pol = out_pol[:, self.seg_dim:, :, :]
             ret.update({'seg': seg_pred_pol, 'vertex': ver_pred_pol})
+
+        # if training the RGB inference model, we add the results to the output
+        if self.training and not cfg.pol_inference:
+            seg_pred_pol = out_pol[:, :self.seg_dim, :, :]
+            ver_pred_pol = out_pol[:, self.seg_dim:, :, :]
+            ret.update({'seg_pol': seg_pred_pol, 'vertex_pol': ver_pred_pol})
 
         if not self.training:
             with torch.no_grad():  # this is because the PnP algorithm is not differentiable -> no gradient

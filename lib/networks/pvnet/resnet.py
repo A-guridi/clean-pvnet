@@ -3,6 +3,7 @@ import math
 import torch.utils.model_zoo as model_zoo
 import numpy as np
 import torch
+from lib.config import cfg
 
 __all__ = ['ResNet', 'resnet18', 'resnet34', 'resnet50', 'resnet101',
            'resnet152']
@@ -243,7 +244,7 @@ class ResNet(nn.Module):
         return nn.Sequential(*layers)
 
     def forward(self, x):
-        if True:
+        if self.training or cfg.pol_inference:
             x_rgb, x_pol = torch.split(x, [3, 2], dim=1)
         else:
             x_rgb = x
@@ -260,7 +261,7 @@ class ResNet(nn.Module):
         x_rgb = x32s
 
         # for the polarized part
-        if True:
+        if self.training or cfg.pol_inference:
             x_pol = self.conv_input2(x_pol)
             x_pol = self.bn2(x_pol)
             x2s_pol = self.relu2(x_pol)             # shape 64

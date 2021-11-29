@@ -111,12 +111,19 @@ def make_transforms(cfg, is_train):
             ]
         )
     else:
-        transform = Compose(
-            [
-                ToTensor(),
-                # change to NormalizeTest for RGB only inference
-                NormalizeTraining(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225], to_bgr=True),
-            ]
-        )
+        if cfg.pol_inference:
+            transform = Compose(
+                [
+                    ToTensor(),
+                    # change to NormalizeTest for RGB only inference
+                    NormalizeTraining(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225], to_bgr=True),
+                ])
+        else:
+            transform = Compose(
+                [
+                    ToTensor(),
+                    # change to NormalizeTest for RGB only inference
+                    NormalizeTest(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225], to_bgr=True),
+                ])
 
     return transform

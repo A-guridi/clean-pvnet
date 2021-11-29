@@ -28,6 +28,7 @@ class Dataset(data.Dataset):
             stokes_types = self.cfg.train.stokes_params
         self.stokes_types = stokes_types
         self.num_stokes = len(stokes_types)
+        self.pol_inference = cfg.pol_inference
         print("Late fusion with stokes parameters:", self.stokes_types)
 
     def read_pol_image(self, im_id, im_width, im_height):
@@ -52,9 +53,9 @@ class Dataset(data.Dataset):
         cls_idx = linemod_config.linemod_cls_names.index(anno['cls']) + 1
         mask = pvnet_data_utils.read_linemod_mask(anno['mask_path'], anno['type'], cls_idx)
 
-        # if self.split == "train":
-        pol_images = self.read_pol_image(img_id, inp.width, inp.height)
-        inp = np.concatenate((inp, pol_images), axis=2)
+        if self.split == "train" or self.pol_inference:
+            pol_images = self.read_pol_image(img_id, inp.width, inp.height)
+            inp = np.concatenate((inp, pol_images), axis=2)
 
         return inp, kpt_2d, mask
 

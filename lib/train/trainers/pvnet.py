@@ -1,6 +1,7 @@
 import torch.nn as nn
 from lib.utils import net_utils
 import torch
+from lib.config import cfg
 
 
 # added Focal loss for segmentation
@@ -32,8 +33,8 @@ class NetworkWrapper(nn.Module):
         scalar_stats.update({'vote_loss': vote_loss})
         loss += vote_loss
 
-        # for the polarization output
-        if False:
+        # only train this additional loss for the RGB inference model with polarized info during training
+        if self.training and not cfg.pol_inference:
             vote_loss_pol = self.vote_crit(output['vertex_pol'] * weight, batch['vertex'] * weight, reduction='sum')
             vote_loss_pol = vote_loss_pol / weight.sum() / batch['vertex'].size(1)
             scalar_stats.update({'vote_loss_pol': vote_loss_pol})
@@ -46,7 +47,7 @@ class NetworkWrapper(nn.Module):
         loss += seg_loss
 
         # for the polarization
-        if False:
+        if self.training and not cfg.pol_inference:
             seg_loss_pol = self.seg_crit(output['seg_pol'], mask)
             scalar_stats.update({'seg_loss_pol': seg_loss_pol})
             loss += seg_loss_pol

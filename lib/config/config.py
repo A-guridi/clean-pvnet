@@ -68,6 +68,7 @@ cfg.train.batch_sampler = ''
 
 # added for polarization
 cfg.train.stokes_params = []
+cfg.train.pol_inference = False
 
 # test
 cfg.test = CN()

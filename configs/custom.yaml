@@ -22,6 +22,7 @@ train:
     weight_decay: 0.
     batch_sampler: 'image_size'
     stokes_params: ["_s1.jpg", "_s2.jpg"]
+    pol_inference: False
 test:
     dataset: 'CustomGlass'
     batch_size: 1
