@@ -58,7 +58,9 @@ def create_custom_val(train_root, val_root, val_size=80, max_val=600):
         for pol in ["_dolp", "_aolp", "_s1", "_s2"]:
             shutil.copy2(pol_root + str(i) + pol + ".jpg", pol_out + str(i) + pol + ".jpg")
 
-    shutil.copy2(train_root + "model.obj", val_root + "model.obj")
+    shutil.copy2(train_root + "/model.obj", val_root + "/model.obj")
+    shutil.copy2(train_root + "/diameter.txt", val_root + "/diameter.txt")
+    shutil.copy2(train_root + "/camera.txt", val_root + "/camera.txt")
 
 
 def resize_all_images(data_root, new_size=None):
