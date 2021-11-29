@@ -295,6 +295,7 @@ def run_custom_complex():
 
     handle_custom_dataset.sample_fps_points(new_val)
     handle_custom_dataset.custom_to_coco(new_val)
+    handle_custom_dataset.resize_all_images(new_val)
 
 
 def run_detector_pvnet():
