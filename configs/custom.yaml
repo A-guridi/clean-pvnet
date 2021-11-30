@@ -1,6 +1,6 @@
 # wait
 model: 'custom'
-model_dir: 'data/model_lf_s1_s2'
+model_dir: 'data/model_cpx_cup_adolp_polinf'
 network: 'res'
 heads: ''
 task: 'pvnet'
@@ -22,8 +22,8 @@ train:
     weight_decay: 0.
     batch_sampler: 'image_size'
     stokes_params: ["_dolp.jpg", "_aolp.jpg"]
-    pol_inference: False
+    pol_inference: True
 test:
-    dataset: 'CustomTest'
+    dataset: 'CustomComplexVal'
     batch_size: 1
     batch_sampler: 'image_size'
