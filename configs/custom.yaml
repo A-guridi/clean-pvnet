@@ -1,6 +1,6 @@
 # wait
 model: 'custom'
-model_dir: 'data/model_cup_cpx_adolp_RGB_inf'
+model_dir: 'data/model_lf_s1_s2'
 network: 'res'
 heads: ''
 task: 'pvnet'
