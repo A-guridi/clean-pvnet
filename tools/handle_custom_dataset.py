@@ -33,24 +33,56 @@ def run_all_custom(data_root, old_data_root, new_size=(512, 512)):
 
 
 def rename_val(val_root, base_numb=520):
-
     rgb_out = os.path.join(val_root, "rgb/")
     pose_out = os.path.join(val_root, "pose/")
     mask_out = os.path.join(val_root, "mask/")
     pol_out = os.path.join(val_root, "pol/")
 
     for i in range(len(os.listdir(rgb_out))):
-        os.rename(rgb_out+str(base_numb+i)+".jpg", rgb_out+str(i)+".jpg" )
-        os.rename(pose_out+"pose"+str(base_numb+i)+".npy", pose_out+"pose"+str(i)+".npy")
+        os.rename(rgb_out + str(base_numb + i) + ".jpg", rgb_out + str(i) + ".jpg")
+        os.rename(pose_out + "pose" + str(base_numb + i) + ".npy", pose_out + "pose" + str(i) + ".npy")
         os.rename(mask_out + str(base_numb + i) + ".png", mask_out + str(i) + ".png")
         for pol in ["_dolp", "_aolp", "_s1", "_s2"]:
-            os.rename(pol_out + str(base_numb+i) + pol + ".jpg", pol_out + str(i) + pol + ".jpg")
+            os.rename(pol_out + str(base_numb + i) + pol + ".jpg", pol_out + str(i) + pol + ".jpg")
+
+
+def creat_pol_pics(pol_root, new_root, new_size=(512, 512)):
+    pol_file = os.path.join(pol_root, "polarization")
+    all_pol_pics = os.listdir(pol_file)
+    new_pol_root = os.path.join(new_root, "pol")
+
+    for pic in all_pol_pics:
+        im = cv2.imread(os.path.join(pol_file, pic))
+        im = cv2.cvtColor(im, cv2.COLOR_BGR2GRAY)
+        h, w = im.shape
+        im_0 = im[:h / 2, :w / 2]
+        im_45 = im[:h / 2, w / 2:]
+        im_90 = im[h / 2:, :w / 2]
+        im_135 = im[h / 2:, w / 2:]
+
+        s_0 = im_0 + im_90
+        s_1 = im_0 - im_90
+        s_2 = im_45 - im_135
+        dolp = np.sqrt(s_1 ** 2 + s_2 ** 2) / s_0
+        aolp = 0.5 * np.arctan(s_2 / s_1)
+
+        cv2.resize(s_1, new_size, s_1, interpolation=cv2.INTER_AREA)
+        cv2.resize(s_2, new_size, s_2, interpolation=cv2.INTER_AREA)
+        cv2.resize(dolp, new_size, dolp, interpolation=cv2.INTER_AREA)
+        cv2.resize(aolp, new_size, aolp, interpolation=cv2.INTER_AREA)
+
+        cv2.imwrite(new_pol_root + "/" + str(int(pic[:-4])) + "_s1.png", s_1)
+        cv2.imwrite(new_pol_root + "/" + str(int(pic[:-4])) + "_s2.png", s_2)
+        cv2.imwrite(new_pol_root + "/" + str(int(pic[:-4])) + "_dolp.png", dolp)
+        cv2.imwrite(new_pol_root + "/" + str(int(pic[:-4])) + "_aolp.png", aolp)
+
+
 
 def create_custom_val(train_root, val_root, val_size=80, max_val=600):
     if os.path.isdir(val_root):
         shutil.rmtree(val_root)
         os.mkdir(val_root)
-    rand_vals = list(range(max_val-val_size, max_val))
+    rand_vals = list(range(max_val - val_size, max_val))
     rgb_root = os.path.join(train_root, "rgb/")
     rgb_out = os.path.join(val_root, "rgb/")
     pose_root = os.path.join(train_root, "pose/")
@@ -110,7 +142,7 @@ def resize_all_images(data_root, new_size=None):
 
         width_ratio = width / img.shape[1]
         height_ratio = height / img.shape[0]
-        #if width_ratio == 1 and height_ratio == 1:
+        # if width_ratio == 1 and height_ratio == 1:
         #    continue  # no need to resize for this image
         img = cv2.resize(img, (width, height), interpolation=cv2.INTER_AREA)
         cv2.imwrite(im_path, img)
