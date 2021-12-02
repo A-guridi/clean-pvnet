@@ -176,6 +176,7 @@ class ResNet(nn.Module):
         self.layer1_2 = self._make_layer(block, 64, layers[0])
         self.layer2_2 = self._make_layer(block, 128, layers[1], stride=2)
         self.layer3_2 = self._make_layer(block, 256, layers[2], stride=2)
+        self.layer4_2 = self._make_layer(block, 512, layers[3], stride=2)
 
         # this concat layer will have an input of 512*2
         self.inplanes *= 2
