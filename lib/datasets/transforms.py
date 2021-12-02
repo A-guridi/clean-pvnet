@@ -43,8 +43,8 @@ class NormalizeTraining(object):
     def __call__(self, img, kpts, mask):
         # added calculation of the mean values of the 2 additional channels on the fly
         # usually values are mean=[0.002248, 0.002258] and std=[0.001851, 0.001850]
-        n_mean = self.mean + [np.mean(img[:, :, 3]), np.mean(img[:, :, 4])]
-        n_std = self.std + [np.std(img[:, :, 3]), np.std(img[:, :, 4])]
+        n_mean = self.mean + [np.mean(img[:, :, 3]), np.mean(img[:, :, 4]), np.mean(img[:, :, 5])]
+        n_std = self.std + [np.std(img[:, :, 3]), np.std(img[:, :, 4]), np.std(img[:, :, 5])]
         img -= n_mean
         img /= n_std
         if self.to_bgr:  # we put the channels first, then the rows and columns
