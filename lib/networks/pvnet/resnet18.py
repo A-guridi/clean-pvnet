@@ -113,17 +113,18 @@ class Resnet18(nn.Module):
         # used during training for RGB inference or always (train+inference) for polarized models
         if self.training or cfg.train.pol_inference:
             # on training, xfc is the combination of both feature maps from RGB and polarization
-            fm = self.conv8s_pol(torch.cat([xfc, x8s, x8s_pol], 1))
+            fm = self.conv8s_pol(torch.cat([F.normalize(xfc), F.normalize(x8s), F.normalize(x8s_pol)], 1))
             fm = self.up8sto4s(fm)
             if fm.shape[2] == 136:
                 fm = nn.functional.interpolate(fm, (135, 180), mode='bilinear', align_corners=False)
 
-            fm = self.conv4s_pol(torch.cat([fm, x4s, x4s_pol], 1))
+            fm = self.conv4s_pol(torch.cat([F.normalize(fm), F.normalize(x4s), F.normalize(x4s_pol)], 1))
             fm = self.up4sto2s(fm)
-            fm = self.conv2s_pol(torch.cat([fm, x2s, x2s_pol], 1))
+            fm = self.conv2s_pol(torch.cat([F.normalize(fm), F.normalize(x2s), F.normalize(x2s_pol)], 1))
             fm = self.up2storaw(fm)
             out_pol = self.convraw_pol(
-                torch.cat([fm, x], 1))  # this layer was changed depending on the channels of input
+                torch.cat([F.normalize(fm), F.normalize(x)], 1))  # this layer was changed depending on the channels of
+            # input
 
             xfc = x_rgb
             x, _ = torch.split(x, [3, 2], dim=1)
@@ -132,15 +133,15 @@ class Resnet18(nn.Module):
 
         # only used for non polarized models RGB only inference, used both during training and inference
         if not cfg.train.pol_inference:
-            fm_rgb = self.conv8s(torch.cat([xfc, x8s], 1))
+            fm_rgb = self.conv8s(torch.cat([F.normalize(xfc), F.normalize(x8s)], 1))
             fm_rgb = self.up8sto4s(fm_rgb)
             if fm_rgb.shape[2] == 136:
                 fm_rgb = nn.functional.interpolate(fm_rgb, (135, 180), mode='bilinear', align_corners=False)
-            fm_rgb = self.conv4s(torch.cat([fm_rgb, x4s], 1))
+            fm_rgb = self.conv4s(torch.cat([F.normalize(fm_rgb), F.normalize(x4s)], 1))
             fm_rgb = self.up4sto2s(fm_rgb)
-            fm_rgb = self.conv2s(torch.cat([fm_rgb, x2s], 1))
+            fm_rgb = self.conv2s(torch.cat([F.normalize(fm_rgb), F.normalize(x2s)], 1))
             fm_rgb = self.up2storaw(fm_rgb)
-            out_rgb = self.convraw(torch.cat([fm_rgb, x], 1))
+            out_rgb = self.convraw(torch.cat([F.normalize(fm_rgb), F.normalize(x)], 1))
 
             # we have now 2 outputs from 2 decoders, which will be fed to two different PnP algorithms and their
             # Losses added

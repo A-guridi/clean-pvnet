@@ -147,6 +147,7 @@ class ResNet(nn.Module):
         self.layer2 = self._make_layer(block, 128, layers[1], stride=2)
         self.layer3 = self._make_layer(block, 256, layers[2], stride=2)
         self.layer4 = self._make_layer(block, 512, layers[3], stride=2)
+        # self.layer5 = self._make_layer(block, 512, layers[3], stride=2)
 
         self.avgpool = nn.AvgPool2d(7)
 
@@ -175,7 +176,6 @@ class ResNet(nn.Module):
         self.layer1_2 = self._make_layer(block, 64, layers[0])
         self.layer2_2 = self._make_layer(block, 128, layers[1], stride=2)
         self.layer3_2 = self._make_layer(block, 256, layers[2], stride=2)
-        self.layer4_2 = self._make_layer(block, 512, layers[3], stride=2)
 
         # this concat layer will have an input of 512*2
         self.inplanes *= 2
@@ -275,7 +275,7 @@ class ResNet(nn.Module):
 
             # concatenate both and add up
             # until here two tensors of [4, 512, im.width, im.height]
-            x_out = self.concat_layer(torch.cat([x_rgb, x_pol], 1))
+            x_out = self.concat_layer(torch.cat([nn.functional.normalize(x_rgb), nn.functional.normalize(x_pol)], 1))
             # x_out.shape= [4, 512, im.width, im.height]
 
         else:
