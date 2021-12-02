@@ -22,9 +22,9 @@ class Evaluator:
         self.coco = coco.COCO(self.ann_file)
 
         data_root = args['data_root']
-        model_path = 'data/custom/model.ply'
+        model_path = data_root + '/model.ply'
         self.model = pvnet_data_utils.get_ply_model(model_path)
-        self.diameter = np.loadtxt('data/custom/diameter.txt').item()
+        self.diameter = np.loadtxt(data_root+'/diameter.txt').item()
 
         self.proj2d = []
         self.add = []
@@ -40,7 +40,7 @@ class Evaluator:
 
         self.proj2d.append(proj_mean_diff < threshold)
 
-    def add_metric(self, pose_pred, pose_targets, icp=False, syn=False, percentage=0.1):
+    def add_metric(self, pose_pred, pose_targets, icp=False, syn=False, percentage=0.35):
         diameter = self.diameter * percentage
         model_pred = np.dot(self.model, pose_pred[:, :3].T) + pose_pred[:, 3]
         model_targets = np.dot(self.model, pose_targets[:, :3].T) + pose_targets[:, 3]

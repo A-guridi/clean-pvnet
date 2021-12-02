@@ -77,7 +77,6 @@ def creat_pol_pics(pol_root, new_root, new_size=(512, 512)):
         cv2.imwrite(new_pol_root + "/" + str(int(pic[:-4])) + "_aolp.png", aolp)
 
 
-
 def create_custom_val(train_root, val_root, val_size=80, max_val=600):
     if os.path.isdir(val_root):
         shutil.rmtree(val_root)
