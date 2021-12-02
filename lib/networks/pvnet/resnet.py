@@ -121,7 +121,7 @@ class ResNet(nn.Module):
                  fully_conv=False,
                  remove_avg_pool_layer=False,
                  output_stride=32,
-                 input_channels=5):
+                 input_channels=3 + len(cfg.train.stokes_params)):
 
         # Add additional variables to track
         # output stride. Necessary to achieve
@@ -129,6 +129,7 @@ class ResNet(nn.Module):
         self.output_stride = output_stride
         self.current_stride = 4
         self.current_dilation = 1
+        self.input_channels = input_channels
 
         self.remove_avg_pool_layer = remove_avg_pool_layer
 
@@ -163,7 +164,7 @@ class ResNet(nn.Module):
         # ADDED
         # now to make the parallel backbone similar to the one existing already but taking as input the polarization
         # images
-        self.conv_input2 = nn.Conv2d(input_channels - 3, 64, kernel_size=7, stride=2, padding=3,
+        self.conv_input2 = nn.Conv2d(self.input_channels - 3, 64, kernel_size=7, stride=2, padding=3,
                                      bias=False)
         self.bn2 = nn.BatchNorm2d(64)
         self.relu2 = nn.ReLU(inplace=True)
@@ -196,6 +197,8 @@ class ResNet(nn.Module):
     def initialize_pretrained_weights_bi_encoder(self):
         # this function copies the weights from the normal backbone into the separate backbone
         self.bn2.weight.data = self.bn1.weight.data
+        if self.input_channels == 6:
+            self.conv_input2.weight.data = self.conv_input.weight.data
         # all have length 2 for the resnet18
         for i in range(len(self.layer1)):
             pretrained_dict = self.layer1[i].state_dict()
@@ -246,7 +249,7 @@ class ResNet(nn.Module):
 
     def forward(self, x):
         if self.training or cfg.train.pol_inference:
-            x_rgb, x_pol = torch.split(x, [3, 2], dim=1)
+            x_rgb, x_pol = torch.split(x, [3, self.input_channels-3], dim=1)
         else:
             x_rgb = x
         # for the rgb part
@@ -265,13 +268,13 @@ class ResNet(nn.Module):
         if self.training or cfg.train.pol_inference:
             x_pol = self.conv_input2(x_pol)
             x_pol = self.bn2(x_pol)
-            x2s_pol = self.relu2(x_pol)             # shape 64
+            x2s_pol = self.relu2(x_pol)  # shape 64
             x_pol = self.maxpool2(x2s_pol)
 
-            x4s_pol = self.layer1_2(x_pol)          # shape 64
-            x8s_pol = self.layer2_2(x4s_pol)        # shape 128
-            x16s_pol = self.layer3_2(x8s_pol)       # shape 256
-            x32s_pol = self.layer4_2(x16s_pol)      # shape 512
+            x4s_pol = self.layer1_2(x_pol)  # shape 64
+            x8s_pol = self.layer2_2(x4s_pol)  # shape 128
+            x16s_pol = self.layer3_2(x8s_pol)  # shape 256
+            x32s_pol = self.layer4_2(x16s_pol)  # shape 512
             x_pol = x32s_pol
 
             # concatenate both and add up

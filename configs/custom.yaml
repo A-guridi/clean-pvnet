@@ -1,6 +1,6 @@
 # wait
 model: 'custom'
-model_dir: 'data/glass_rgb_inf_adolp_norm'
+model_dir: 'data/cup_cpx_3p_adolps1_03add'
 network: 'res'
 heads: ''
 task: 'pvnet'
@@ -14,16 +14,16 @@ train:
     milestones: (20, 40, 60, 80, 100, 120, 160, 180, 200, 220)
     gamma: 0.5
     batch_size: 4
-    dataset: 'CustomGlass'
+    dataset: 'CustomComplex'
     cropresize_rate: 1.0
     rotate_rate: 1.0
     rotate_min: -30
     rotate_max: 30
     weight_decay: 0.
     batch_sampler: 'image_size'
-    stokes_params: ["_dolp.jpg", "_aolp.jpg"]
+    stokes_params: ["_dolp.jpg", "_aolp.jpg", "_s1.jpg"]
     pol_inference: False
 test:
-    dataset: 'CustomGlass'
+    dataset: 'CustomComplexVal'
     batch_size: 1
     batch_sampler: 'image_size'
