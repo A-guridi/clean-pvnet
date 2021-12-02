@@ -127,7 +127,7 @@ class Resnet18(nn.Module):
             # input
 
             xfc = x_rgb
-            x, _ = torch.split(x, [3, 2], dim=1)
+            x, _ = torch.split(x, [3, self.input_channels-3], dim=1)
             # when training, we change the value of xfc once used so the RGB decoder (conv8s) gets only
             # the RGB input. On testing, xfc will automatically be the output of the RGB encoder only
 
