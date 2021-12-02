@@ -35,18 +35,22 @@ class ToTensor(object):
 class NormalizeTraining(object):
     # this is the one with polarized images
 
-    def __init__(self, mean, std, to_bgr=True):
+    def __init__(self, mean, std, to_bgr=True, in_channels=5):
         self.mean = mean
         self.std = std
         self.to_bgr = to_bgr
+        self.in_channels = in_channels
+        for i in range(in_channels-3):
+            self.mean.append(0.00225)
+            self.std.append(0.001851)
 
     def __call__(self, img, kpts, mask):
         # added calculation of the mean values of the 2 additional channels on the fly
         # usually values are mean=[0.002248, 0.002258] and std=[0.001851, 0.001850]
-        n_mean = self.mean + [np.mean(img[:, :, 3]), np.mean(img[:, :, 4]), np.mean(img[:, :, 5])]
-        n_std = self.std + [np.std(img[:, :, 3]), np.std(img[:, :, 4]), np.std(img[:, :, 5])]
-        img -= n_mean
-        img /= n_std
+        # n_mean = self.mean + [np.mean(img[:, :, 3]), np.mean(img[:, :, 4]), np.mean(img[:, :, 5])]
+        # n_std = self.std + [np.std(img[:, :, 3]), np.std(img[:, :, 4]), np.std(img[:, :, 5])]
+        img -= self.mean
+        img /= self.std
         if self.to_bgr:  # we put the channels first, then the rows and columns
             img = img.transpose(2, 0, 1).astype(np.float32)
         return img, kpts, mask
@@ -84,7 +88,8 @@ class ColorJitter(object):
             hue=hue, )
 
     def __call__(self, image, kpts, mask):
-        image[:, :, :3] = np.asarray(self.color_jitter(Image.fromarray(np.ascontiguousarray(image[:, :, :3], np.uint8))))
+        image[:, :, :3] = np.asarray(
+            self.color_jitter(Image.fromarray(np.ascontiguousarray(image[:, :, :3], np.uint8))))
         return image, kpts, mask
 
 
@@ -101,13 +106,15 @@ class RandomBlur(object):
 
 
 def make_transforms(cfg, is_train):
+    in_channels = 3 + len(cfg.train.stokes_params)
     if is_train is True:
         transform = Compose(
             [
                 RandomBlur(0.5),
                 ColorJitter(0.1, 0.1, 0.05, 0.05),
                 ToTensor(),
-                NormalizeTraining(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225], to_bgr=True),
+                NormalizeTraining(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225], to_bgr=True,
+                                  in_channels=in_channels),
             ]
         )
     else:
@@ -116,7 +123,8 @@ def make_transforms(cfg, is_train):
                 [
                     ToTensor(),
                     # change to NormalizeTest for RGB only inference
-                    NormalizeTraining(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225], to_bgr=True),
+                    NormalizeTraining(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225], to_bgr=True,
+                                      in_channels=in_channels),
                 ])
         else:
             transform = Compose(
