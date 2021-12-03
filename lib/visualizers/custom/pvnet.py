@@ -20,7 +20,11 @@ class Visualizer:
         self.coco = coco.COCO(self.ann_file)
 
     def visualize(self, output, batch):
-        inp = img_utils.unnormalize_img(batch['inp'][0], mean, std).permute(1, 2, 0)
+        if cfg.train.pol_inference:
+            inpt = batch['inp'][0][:, :, :3]
+        else:
+            inpt = batch['inp'][0]
+        inp = img_utils.unnormalize_img(inpt, mean, std).permute(1, 2, 0)
         kpt_2d = output['kpt_2d'][0].detach().cpu().numpy()
 
         img_id = int(batch['img_id'][0])

@@ -24,6 +24,6 @@ train:
     stokes_params: ["_dolp.jpg", "_aolp.jpg", "_s1.jpg"]
     pol_inference: False
 test:
-    dataset: 'CustomComplexVal'
+    dataset: 'CustomTest'
     batch_size: 1
     batch_sampler: 'image_size'
