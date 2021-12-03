@@ -19,6 +19,7 @@ class Dataset(data.Dataset):
 
         self.data_root = data_root
         self.pol_data = os.path.join(self.data_root, "pol/")
+        print("Loading the ", split, "dataset")
         self.split = split
         self.coco = COCO(ann_file)
         self.img_ids = np.array(sorted(self.coco.getImgIds()))
