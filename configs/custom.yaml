@@ -1,6 +1,6 @@
 # wait
 model: 'custom'
-model_dir: 'data/model_cup_cpx_adolp_RGB_inf'
+model_dir: 'data/cup_cpx_3p_adolps1_03add_polinf'
 network: 'res'
 heads: ''
 task: 'pvnet'
@@ -21,9 +21,9 @@ train:
     rotate_max: 30
     weight_decay: 0.
     batch_sampler: 'image_size'
-    stokes_params: ["_dolp.jpg", "_aolp.jpg"]
-    pol_inference: False
+    stokes_params: ["_dolp.jpg", "_aolp.jpg", "_s1.jpg"]
+    pol_inference: True
 test:
-    dataset: 'CustomTest'
+    dataset: 'CustomComplexVal'
     batch_size: 1
     batch_sampler: 'image_size'
