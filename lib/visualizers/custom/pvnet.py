@@ -21,6 +21,8 @@ class Visualizer:
 
     def visualize(self, output, batch):
         inp = img_utils.unnormalize_img(batch['inp'][0][:, :, :3], mean, std).permute(1, 2, 0)
+        plt.imshow(inp)
+        plt.show()
         kpt_2d = output['kpt_2d'][0].detach().cpu().numpy()
 
         img_id = int(batch['img_id'][0])
