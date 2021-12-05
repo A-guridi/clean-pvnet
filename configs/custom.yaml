@@ -1,6 +1,6 @@
 # wait
 model: 'custom'
-model_dir: 'data/cup_cpx_3p_adolps1_03add'
+model_dir: 'data/cup_cpx_3p_adolps1_03add_polinf'
 network: 'res'
 heads: ''
 task: 'pvnet'
