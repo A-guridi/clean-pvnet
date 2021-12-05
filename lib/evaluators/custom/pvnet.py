@@ -40,7 +40,7 @@ class Evaluator:
 
         self.proj2d.append(proj_mean_diff < threshold)
 
-    def add_metric(self, pose_pred, pose_targets, icp=False, syn=False, percentage=0.3):
+    def add_metric(self, pose_pred, pose_targets, icp=False, syn=False, percentage=0.1):
         diameter = self.diameter * percentage
         model_pred = np.dot(self.model, pose_pred[:, :3].T) + pose_pred[:, 3]
         model_targets = np.dot(self.model, pose_targets[:, :3].T) + pose_targets[:, 3]
