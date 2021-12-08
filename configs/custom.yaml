@@ -22,7 +22,7 @@ train:
     weight_decay: 0.
     batch_sampler: 'image_size'
     stokes_params: ["_dolp.jpg", "_aolp.jpg"]
-    pol_inference: True
+    pol_inference: False
 test:
     dataset: 'CustomTest'
     batch_size: 1
